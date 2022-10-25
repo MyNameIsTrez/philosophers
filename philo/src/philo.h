@@ -31,6 +31,13 @@ typedef struct s_philosopher
 	pthread_t		thread; // TODO: Do I need to even store this at all?
 }	t_philosopher;
 
+typedef enum s_event
+{
+	EVENT_FORK,
+	EVENT_SLEEP,
+	EVENT_EAT,
+}	t_event;
+
 bool	ph_atoi_safe(const char *str, t_i32 *nbr);
 
 #endif

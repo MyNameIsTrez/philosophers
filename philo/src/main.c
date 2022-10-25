@@ -22,6 +22,22 @@ t_f64	get_current_ms_time(void)
 	return (tv.tv_sec * 1000 + ((t_f64)tv.tv_usec) / 1000);
 }
 
+static char	*get_event_string(t_event event)
+{
+	char	*event_strings[] = {
+		[EVENT_FORK] = "has taken a fork",
+		[EVENT_SLEEP] = "???some sleeping string???",
+		[EVENT_EAT] = "is eating",
+	};
+
+	return (event_strings[event]);
+}
+
+static void	print_event(size_t philosopher_index, t_event event)
+{
+	printf("%.0f %zu %s\n", get_current_ms_time(), philosopher_index, get_event_string(event));
+}
+
 static void	*run_philosopher(void *arg)
 {
 	t_philosopher	*philosopher;
@@ -32,14 +48,47 @@ static void	*run_philosopher(void *arg)
 	{
 		if ((philosopher->index & 1) == 0)
 		{
-
+			if (pthread_mutex_lock(philosopher->left_fork) != 0)
+			{
+				// TODO: What to do in this case?
+			}
+			print_event(philosopher->index, EVENT_FORK);
+			if (pthread_mutex_lock(philosopher->right_fork) != 0)
+			{
+				// TODO: What to do in this case?
+			}
+			print_event(philosopher->index, EVENT_FORK);
 		}
 		else
 		{
-
+			if (pthread_mutex_lock(philosopher->right_fork) != 0)
+			{
+				// TODO: What to do in this case?
+			}
+			print_event(philosopher->index, EVENT_FORK);
+			if (pthread_mutex_lock(philosopher->left_fork) != 0)
+			{
+				// TODO: What to do in this case?
+			}
+			print_event(philosopher->index, EVENT_FORK);
 		}
 
+		philosopher->ms_time_of_last_meal = get_current_ms_time();
+
+		usleep(1000000); // TODO: Change to better value
+
 		// die if more than 10 ms passed
+
+		// TODO: Does the unlocking need to occur in the same order as the locking? If so, then this won't work:
+
+		if (pthread_mutex_unlock(philosopher->left_fork) != 0)
+		{
+			// TODO: What to do in this case?
+		}
+		if (pthread_mutex_unlock(philosopher->right_fork) != 0)
+		{
+			// TODO: What to do in this case?
+		}
 
 		usleep(1000000); // TODO: Change to better value
 	}
@@ -141,7 +190,7 @@ int	main(int argc, char *argv[])
 		{
 			if (get_current_ms_time() - philosophers[philosopher_index].ms_time_of_last_meal > 3e3)
 			{
-				printf("foo\n");
+				printf("???philosopher %zu died???\n", philosopher_index);
 				return (EXIT_FAILURE);
 			}
 

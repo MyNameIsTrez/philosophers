@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   private_atoi_safe.h                                :+:    :+:            */
+/*   ph_private_atoi_safe.h                             :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PRIVATE_ATOI_SAFE_H
-# define PRIVATE_ATOI_SAFE_H
+#ifndef PH_PRIVATE_ATOI_SAFE_H
+# define PH_PRIVATE_ATOI_SAFE_H
 
 # include <limits.h>
 

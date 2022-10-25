@@ -24,9 +24,11 @@
 
 typedef struct s_philosopher
 {
-	size_t		philosopher_index;
-	t_f64		ms_time_of_last_meal; // TODO: What type should I be using here?
-	pthread_t	thread;
+	size_t			index;
+	t_f64			ms_time_of_last_meal; // TODO: What type should I be using here?
+	pthread_mutex_t	*left_fork;
+	pthread_mutex_t	*right_fork;
+	pthread_t		thread; // TODO: Do I need to even store this at all?
 }	t_philosopher;
 
 bool	ph_atoi_safe(const char *str, t_i32 *nbr);

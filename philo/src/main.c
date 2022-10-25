@@ -30,9 +30,14 @@ static void	*run_philosopher(void *arg)
 
 	while (true)
 	{
-		// if ()
-		// {
-		// }
+		if ((philosopher->index & 1) == 0)
+		{
+
+		}
+		else
+		{
+
+		}
 
 		// die if more than 10 ms passed
 
@@ -42,7 +47,7 @@ static void	*run_philosopher(void *arg)
 	return (NULL);
 }
 
-static t_philosopher	*create_philosophers(size_t philosopher_count)
+static t_philosopher	*create_philosophers(size_t philosopher_count, pthread_mutex_t *forks)
 {
 	t_philosopher	*philosophers;
 	size_t			philosopher_index;
@@ -58,10 +63,13 @@ static t_philosopher	*create_philosophers(size_t philosopher_count)
 	{
 		philosopher = &philosophers[philosopher_index];
 
-		philosopher->philosopher_index = philosopher_index;
+		philosopher->index = philosopher_index;
 		philosopher->ms_time_of_last_meal = get_current_ms_time();
 
-		if (pthread_create(&philosopher->thread, NULL, run_philosopher, philosopher) != 0)
+		philosopher->left_fork = &forks[philosopher_index];
+		philosopher->right_fork = &forks[(philosopher_index + 1) % philosopher_count];
+
+		if (pthread_create(&philosopher->thread, NULL, run_philosopher, philosopher) != 0) // TODO: Are default attributes OK?
 		{
 			// TODO: Free the previous philosophers when there's an error?
 			return (NULL);
@@ -73,16 +81,32 @@ static t_philosopher	*create_philosophers(size_t philosopher_count)
 	return (philosophers);
 }
 
+pthread_mutex_t	*init_forks(size_t fork_count)
+{
+	size_t			fork_index;
+	pthread_mutex_t	*forks;
+
+	fork_index = 0;
+	forks = malloc(fork_count * sizeof(pthread_mutex_t));
+	while (fork_index < fork_count)
+	{
+		if (pthread_mutex_init(&forks[fork_index], NULL) != 0) // TODO: Are default attributes OK?
+		{
+			// TODO: Should this also be destroying the previously init mutexes?
+			return (NULL);
+		}
+		fork_index++;
+	}
+
+	return (forks);
+}
+
 int	main(int argc, char *argv[])
 {
-	t_philosopher	*philosophers;
-
 	// TODO: Check argc and argv
-
-	t_i32	tentative_philosopher_count;
-
 	(void)argc;
 
+	t_i32	tentative_philosopher_count;
 	if (!ph_atoi_safe(argv[1], &tentative_philosopher_count))
 	{
 		// TODO: Should this be returning EXIT_FAILURE?
@@ -92,7 +116,17 @@ int	main(int argc, char *argv[])
 
 	size_t	philosopher_count = (size_t)tentative_philosopher_count;
 
-	philosophers = create_philosophers(philosopher_count);
+	pthread_mutex_t	*forks;
+	forks = init_forks(philosopher_count);
+	if (forks == NULL)
+	{
+		// TODO: Should this be returning EXIT_FAILURE?
+		// TODO: And should it also print an error message?
+		return (EXIT_FAILURE);
+	}
+
+	t_philosopher	*philosophers;
+	philosophers = create_philosophers(philosopher_count, forks);
 	if (philosophers == NULL)
 	{
 		// TODO: Should this be returning EXIT_FAILURE?

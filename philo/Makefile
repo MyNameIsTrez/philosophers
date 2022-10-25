@@ -27,11 +27,15 @@ LIBS :=
 ################################################################################
 
 SOURCES :=\
+src/atoi_safe/private/atoi_range.c\
+src/atoi_safe/private/utils.c\
+src/atoi_safe/atoi_safe.c\
 src/main.c
 
 ################################################################################
 
 HEADERS +=\
+src/atoi_safe/private/ph_private_atoi_safe.h\
 src/philo.h
 
 ################################################################################
@@ -60,9 +64,7 @@ OBJECT_PATHS := $(addprefix $(OBJ_DIR)/,$(SOURCES:.c=.o))
 MAKE_DATA := $(shell uname) $(CFLAGS) $(LIBS) $(SOURCES)
 DATA_FILE := .make_data
 
-ifneq (
-	$(shell echo "$(MAKE_DATA)"),
-	$(shell cat "$(DATA_FILE)" 2> /dev/null))
+ifneq ($(shell echo "$(MAKE_DATA)"), $(shell cat "$(DATA_FILE)" 2> /dev/null))
 PRE_RULES := clean
 endif
 

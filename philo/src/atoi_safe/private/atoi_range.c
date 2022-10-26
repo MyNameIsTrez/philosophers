@@ -13,7 +13,7 @@
 #include "philo.h"
 #include "ph_private_atoi_safe.h"
 
-static t_i32	char_to_digit(const char chr)
+static int	char_to_digit(const char chr)
 {
 	if ('0' <= chr && chr <= '9')
 		return (chr - '0');
@@ -29,13 +29,13 @@ static t_i32	char_to_digit(const char chr)
  * or subtracting a digit results in underflow.
  * @return
  */
-static t_i32	get_negative_value(const char *str, bool *out_of_range)
+static int	get_negative_value(const char *str, bool *out_of_range)
 {
-	static const t_i32	range_mult_ten = INT_MIN / 10;
-	static const t_i32	range_last_digit = -(INT_MIN % 10);
-	t_i32				value;
+	static const int	range_mult_ten = INT_MIN / 10;
+	static const int	range_last_digit = -(INT_MIN % 10);
+	int				value;
 	size_t				i;
-	t_i32				digit;
+	int				digit;
 
 	value = 0;
 	i = 0;
@@ -54,18 +54,18 @@ static t_i32	get_negative_value(const char *str, bool *out_of_range)
 }
 
 /**
- * @brief Converts @p str to a t_i32. This function is only supposed to be
+ * @brief Converts @p str to a int. This function is only supposed to be
  * used by atoi() and atoi_safe().
  *
  * @param str May start with whitespace, and the first encountered number will
- * be converted to a t_i32.
+ * be converted to a int.
  * @param out_of_range
  * @return The converted value or 0 if no number was found in @p str.
  */
-t_i32	ph_atoi_range(const char *str, bool *out_of_range)
+int	ph_atoi_range(const char *str, bool *out_of_range)
 {
-	t_i32	sign;
-	t_i32	value;
+	int	sign;
+	int	value;
 	bool	dummy_out_of_range;
 
 	if (out_of_range == NULL)

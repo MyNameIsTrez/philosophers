@@ -20,8 +20,6 @@
 # include <unistd.h>
 # include <stdio.h>
 
-# include "types.h"
-
 # define LOOP_USLEEP 1000 // TODO: Better value
 
 typedef struct s_data	t_data;
@@ -29,7 +27,7 @@ typedef struct s_data	t_data;
 typedef struct s_philosopher
 {
 	size_t			index;
-	t_u64			time_of_last_meal; // TODO: What type should I be using here?
+	size_t			time_of_last_meal; // TODO: What type should I be using here?
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	t_data			*data;
@@ -43,12 +41,12 @@ typedef struct s_data
 
 	pthread_mutex_t	printf_mutex;
 
-	t_u64			start_time;
+	size_t			start_time;
 
 	size_t			philosopher_count;
-	t_u64			time_to_die;
-	t_u64			time_to_eat;
-	t_u64			time_to_sleep;
+	size_t			time_to_die;
+	size_t			time_to_eat;
+	size_t			time_to_sleep;
 	size_t			number_of_times_each_philosopher_must_eat;
 
 	bool			running_philosophers;
@@ -67,6 +65,6 @@ typedef enum s_event
 	EVENT_DIED,
 }	t_event;
 
-bool	ph_atoi_safe(const char *str, t_i32 *nbr);
+bool	ph_atoi_safe(const char *str, int *nbr);
 
 #endif

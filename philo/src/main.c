@@ -13,14 +13,14 @@
 #include "philo.h"
 
 // In milliseconds
-static t_u64	get_time(void)
+static size_t	get_time(void)
 {
 	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
 	// TODO: What if tv.tv_ms is -1? (signed microseconds after all)
 
-	return ((t_u64)tv.tv_sec * 1000 + (t_u64)(tv.tv_usec / 1000));
+	return ((size_t)tv.tv_sec * 1000 + (size_t)(tv.tv_usec / 1000));
 }
 
 static void	print_event(size_t philosopher_index, t_event event, t_data *data)
@@ -37,7 +37,7 @@ static void	print_event(size_t philosopher_index, t_event event, t_data *data)
 	pthread_mutex_lock(&data->printf_mutex);
 	// TODO: Do I need to do anything to make a billion% sure that get_time() - data->start_time won't ever underflow?
 	if (running)
-		printf("%llu %zu %s\n", get_time() - data->start_time, philosopher_index + 1, event_strings[event]);
+		printf("%lu %zu %s\n", get_time() - data->start_time, philosopher_index + 1, event_strings[event]);
 	if (event == EVENT_DIED)
 		running = false;
 	pthread_mutex_unlock(&data->printf_mutex);
@@ -66,6 +66,10 @@ static void	*run_philosopher(void *arg)
 	{
 		if ((philosopher->index & 1) == 0)
 		{
+			// pthread_mutex_lock(&philosopher->data->printf_mutex);
+			// printf("philosopher 1 wants to grab a fork\n");
+			// pthread_mutex_unlock(&philosopher->data->printf_mutex);
+
 			if (pthread_mutex_lock(philosopher->left_fork) != 0)
 			{
 				// TODO: What to do in this case?
@@ -80,6 +84,10 @@ static void	*run_philosopher(void *arg)
 		}
 		else
 		{
+			// pthread_mutex_lock(&philosopher->data->printf_mutex);
+			// printf("philosopher 2 wants to grab a fork\n");
+			// pthread_mutex_unlock(&philosopher->data->printf_mutex);
+
 			if (pthread_mutex_lock(philosopher->right_fork) != 0)
 			{
 				// TODO: What to do in this case?
@@ -106,10 +114,6 @@ static void	*run_philosopher(void *arg)
 				break;
 			}
 			pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
-
-			// pthread_mutex_lock(&philosopher->data->printf_mutex);
-			// printf("%llu %llu\n", get_time() - philosopher->data->start_time, philosopher->data->time_to_eat);
-			// pthread_mutex_unlock(&philosopher->data->printf_mutex);
 
 			if (get_time() - philosopher->time_of_last_meal > philosopher->data->time_to_eat)
 			{
@@ -222,7 +226,7 @@ static void	run(t_data *data)
 
 static void	init_philosophers_time_of_last_meal(t_data *data)
 {
-	t_u64			time;
+	size_t			time;
 	size_t			philosopher_index;
 	t_philosopher	*philosopher;
 
@@ -280,7 +284,7 @@ static bool	init(int argc, char *argv[], t_data *data)
 
 	// TODO: Throw an error in case an arg is < 0 or <= 0?
 
-	t_i32	nbr;
+	int	nbr;
 	if (!ph_atoi_safe(argv[1], &nbr))
 	{
 		// TODO: Should this be returning EXIT_FAILURE?
@@ -294,14 +298,14 @@ static bool	init(int argc, char *argv[], t_data *data)
 		// TODO: And should it also print an error message?
 		return (false);
 	}
-	data->time_to_die = (t_u64)nbr;
+	data->time_to_die = (size_t)nbr;
 	if (!ph_atoi_safe(argv[3], &nbr))
 	{
 		// TODO: Should this be returning EXIT_FAILURE?
 		// TODO: And should it also print an error message?
 		return (false);
 	}
-	data->time_to_eat = (t_u64)nbr;
+	data->time_to_eat = (size_t)nbr;
 	if (!ph_atoi_safe(argv[4], &nbr))
 	{
 		// TODO: Should this be returning EXIT_FAILURE?
@@ -312,7 +316,7 @@ static bool	init(int argc, char *argv[], t_data *data)
 	// TODO: What to do if this argument isn't given?
 	if (argc == 6)
 	{
-		data->time_to_sleep = (t_u64)nbr;
+		data->time_to_sleep = (size_t)nbr;
 		if (!ph_atoi_safe(argv[5], &nbr))
 		{
 			// TODO: Should this be returning EXIT_FAILURE?

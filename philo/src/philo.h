@@ -22,26 +22,36 @@
 
 # include "types.h"
 
-typedef struct s_data
-{
-	bool	running;
-}	t_data;
+typedef struct s_data	t_data;
 
 typedef struct s_philosopher
 {
 	size_t			index;
-	t_f64			ms_time_of_last_meal; // TODO: What type should I be using here?
+	t_u64			time_of_last_meal; // TODO: What type should I be using here?
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	t_data			*data;
 	pthread_t		thread; // TODO: Do I need to even store this at all?
 }	t_philosopher;
 
+typedef struct s_data
+{
+	bool			running;
+	// pthread_mutex_t	running_mutex;
+	size_t			philosopher_count;
+	bool			running_philosophers;
+	pthread_mutex_t	running_philosophers_mutex;
+	t_philosopher	*philosophers;
+	pthread_mutex_t	*forks;
+}	t_data;
+
 typedef enum s_event
 {
 	EVENT_FORK,
-	EVENT_SLEEP,
 	EVENT_EAT,
+	EVENT_SLEEP,
+	EVENT_THINK,
+	EVENT_DIED,
 }	t_event;
 
 bool	ph_atoi_safe(const char *str, t_i32 *nbr);

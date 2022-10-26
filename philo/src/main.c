@@ -12,30 +12,27 @@
 
 #include "philo.h"
 
-static t_f64	get_current_ms_time(void)
+static t_u64	get_current_time(void)
 {
 	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
 	// TODO: What if tv.tv_ms is -1? (signed microseconds after all)
 
-	return (tv.tv_sec * 1000 + ((t_f64)tv.tv_usec) / 1000);
-}
-
-static char	*get_event_string(t_event event)
-{
-	char	*event_strings[] = {
-		[EVENT_FORK] = "has taken a fork",
-		[EVENT_SLEEP] = "???some sleeping string???",
-		[EVENT_EAT] = "is eating",
-	};
-
-	return (event_strings[event]);
+	return ((t_u64)tv.tv_sec * 1000 + (t_u64)(tv.tv_usec / 1000));
 }
 
 static void	print_event(size_t philosopher_index, t_event event)
 {
-	printf("%.0f %zu %s\n", get_current_ms_time(), philosopher_index, get_event_string(event));
+	char	*event_strings[] = {
+		[EVENT_FORK] = "has taken a fork",
+		[EVENT_EAT] = "is eating",
+		[EVENT_SLEEP] = "is sleeping",
+		[EVENT_THINK] = "is thinking",
+		[EVENT_DIED] = "died",
+	};
+
+	printf("%llu %zu %s\n", get_current_time(), philosopher_index, event_strings[event]);
 }
 
 static void	*run_philosopher(void *arg)
@@ -44,7 +41,20 @@ static void	*run_philosopher(void *arg)
 
 	philosopher = arg;
 
-	while (philosopher->data->running)
+	while (true)
+	{
+		pthread_mutex_lock(&philosopher->data->running_philosophers_mutex); // TODO: Check for error?
+		if (philosopher->data->running_philosophers)
+		{
+			pthread_mutex_unlock(&philosopher->data->running_philosophers_mutex); // TODO: Check for error?
+			break;
+		}
+		pthread_mutex_unlock(&philosopher->data->running_philosophers_mutex); // TODO: Check for error?
+
+		usleep(100); // TODO: Change to better value
+	}
+
+	while (philosopher->data->running) // TODO: Wrap this in a mutex?
 	{
 		if ((philosopher->index & 1) == 0)
 		{
@@ -73,7 +83,7 @@ static void	*run_philosopher(void *arg)
 			print_event(philosopher->index, EVENT_FORK);
 		}
 
-		philosopher->ms_time_of_last_meal = get_current_ms_time();
+		philosopher->time_of_last_meal = get_current_time();
 
 		usleep(1000000); // TODO: Change to better value
 
@@ -96,72 +106,75 @@ static void	*run_philosopher(void *arg)
 	return (NULL);
 }
 
-static t_philosopher	*create_philosophers(size_t philosopher_count, pthread_mutex_t *forks, t_data *data)
+static bool	create_philosophers(t_data *data)
 {
-	t_philosopher	*philosophers;
 	size_t			philosopher_index;
 
 	t_philosopher	*philosopher;
 
-	philosophers = malloc(philosopher_count * sizeof(t_philosopher));
-	if (philosophers == NULL)
-		return (NULL);
+	data->philosophers = malloc(data->philosopher_count * sizeof(t_philosopher));
+	if (data->philosophers == NULL)
+		return (false);
 	philosopher_index = 0;
 
-	while (philosopher_index < philosopher_count)
+	while (philosopher_index < data->philosopher_count)
 	{
-		philosopher = &philosophers[philosopher_index];
+		philosopher = &data->philosophers[philosopher_index];
 
 		philosopher->index = philosopher_index;
-		philosopher->ms_time_of_last_meal = get_current_ms_time();
+		philosopher->time_of_last_meal = get_current_time();
 
-		philosopher->left_fork = &forks[philosopher_index];
-		philosopher->right_fork = &forks[(philosopher_index + 1) % philosopher_count];
+		philosopher->left_fork = &data->forks[philosopher_index];
+		philosopher->right_fork = &data->forks[(philosopher_index + 1) % data->philosopher_count];
 
 		philosopher->data = data;
 
 		if (pthread_create(&philosopher->thread, NULL, run_philosopher, philosopher) != 0) // TODO: Are default attributes OK?
 		{
 			// TODO: Free the previous philosophers when there's an error?
-			return (NULL);
+			return (false);
 		}
 
 		philosopher_index++;
 	}
 
-	return (philosophers);
+	return (true);
 }
 
-static pthread_mutex_t	*init_forks(size_t fork_count)
+static bool	init_forks(t_data *data)
 {
 	size_t			fork_index;
-	pthread_mutex_t	*forks;
 
 	fork_index = 0;
-	forks = malloc(fork_count * sizeof(pthread_mutex_t));
-	while (fork_index < fork_count)
+	data->forks = malloc(data->philosopher_count * sizeof(pthread_mutex_t));
+	if (data->forks == NULL)
+		return (false);
+	while (fork_index < data->philosopher_count)
 	{
-		if (pthread_mutex_init(&forks[fork_index], NULL) != 0) // TODO: Are default attributes OK?
+		if (pthread_mutex_init(&data->forks[fork_index], NULL) != 0) // TODO: Are default attributes OK?
 		{
 			// TODO: Should this also be destroying the previously init mutexes?
-			return (NULL);
+			return (false);
 		}
 		fork_index++;
 	}
-
-	return (forks);
+	return (true);
 }
 
-static void	run(t_philosopher *philosophers, size_t philosopher_count, t_data *data)
+static void	run(t_data *data)
 {
+	size_t			philosopher_index;
+	t_philosopher	*philosopher;
+
 	while (true)
 	{
-		size_t	philosopher_index = 0;
-		while (philosopher_index < philosopher_count)
+		philosopher_index = 0;
+		while (philosopher_index < data->philosopher_count)
 		{
-			if (get_current_ms_time() - philosophers[philosopher_index].ms_time_of_last_meal > 2000)
+			philosopher = &data->philosophers[philosopher_index];
+			if (get_current_time() - philosopher->time_of_last_meal > 2000)
 			{
-				printf("???philosopher %zu died???\n", philosopher_index);
+				print_event(philosopher_index, EVENT_DIED);
 
 				data->running = false;
 
@@ -175,15 +188,15 @@ static void	run(t_philosopher *philosophers, size_t philosopher_count, t_data *d
 	}
 }
 
-static void	join_philosophers(t_philosopher *philosophers, size_t philosopher_count)
+static void	join_philosophers(t_data *data)
 {
 	size_t			philosopher_index;
 	t_philosopher	*philosopher;
 
 	philosopher_index = 0;
-	while (philosopher_index < philosopher_count)
+	while (philosopher_index < data->philosopher_count)
 	{
-		philosopher = &philosophers[philosopher_index];
+		philosopher = &data->philosophers[philosopher_index];
 		if (pthread_join(philosopher->thread, NULL) != 0) // TODO: Is having value_ptr at NULL ever not desired?
 		{
 			// TODO: ???
@@ -192,46 +205,67 @@ static void	join_philosophers(t_philosopher *philosophers, size_t philosopher_co
 	}
 }
 
-int	main(int argc, char *argv[])
+static bool	init(int argc, char *argv[], t_data *data)
 {
 	// TODO: Check argc and argv
 	(void)argc;
+	(void)argv;
 
-	t_data	data;
+	// TODO: Is this necessary? It allows me to call free() on these carelessly
+	data->philosophers = NULL;
+	data->forks = NULL;
 
-	data.running = true;
+	data->running = true;
 
 	t_i32	tentative_philosopher_count;
 	if (!ph_atoi_safe(argv[1], &tentative_philosopher_count))
 	{
 		// TODO: Should this be returning EXIT_FAILURE?
 		// TODO: And should it also print an error message?
-		return (EXIT_FAILURE);
+		return (false);
 	}
 
-	size_t	philosopher_count = (size_t)tentative_philosopher_count;
+	data->philosopher_count = (size_t)tentative_philosopher_count;
 
-	pthread_mutex_t	*forks;
-	forks = init_forks(philosopher_count);
-	if (forks == NULL)
+	if (!init_forks(data))
 	{
 		// TODO: Should this be returning EXIT_FAILURE?
 		// TODO: And should it also print an error message?
-		return (EXIT_FAILURE);
+		return (false);
 	}
 
-	t_philosopher	*philosophers;
-	philosophers = create_philosophers(philosopher_count, forks, &data);
-	if (philosophers == NULL)
+	data->running_philosophers = false;
+
+	if (pthread_mutex_init(&data->running_philosophers_mutex, NULL) != 0) // TODO: Are default attributes OK?
+	{
+		// TODO: Should this be doing anything else?
+		return (false);
+	}
+
+	if (!create_philosophers(data))
 	{
 		// TODO: Should this be returning EXIT_FAILURE?
 		// TODO: And should it also print an error message?
-		return (EXIT_FAILURE);
+		return (false);
 	}
 
-	run(philosophers, philosopher_count, &data);
+	pthread_mutex_lock(&data->running_philosophers_mutex); // TODO: Check for error?
+	data->running_philosophers = true;
+	pthread_mutex_unlock(&data->running_philosophers_mutex); // TODO: Check for error?
 
-	join_philosophers(philosophers, philosopher_count);
+	return (true);
+}
+
+int	main(int argc, char *argv[])
+{
+	t_data	data;
+
+	if (!init(argc, argv, &data))
+		return (EXIT_FAILURE);
+
+	run(&data); // TODO: Wrap in error check if-statement?
+
+	join_philosophers(&data); // TODO: Wrap in error check if-statement?
 
 	return (EXIT_SUCCESS);
 }

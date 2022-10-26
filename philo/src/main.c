@@ -12,7 +12,8 @@
 
 #include "philo.h"
 
-static t_u64	get_current_time(void)
+// In milliseconds
+static t_u64	get_time(void)
 {
 	struct timeval	tv;
 
@@ -22,8 +23,9 @@ static t_u64	get_current_time(void)
 	return ((t_u64)tv.tv_sec * 1000 + (t_u64)(tv.tv_usec / 1000));
 }
 
-static void	print_event(size_t philosopher_index, t_event event)
+static void	print_event(size_t philosopher_index, t_event event, t_data *data)
 {
+	static bool	running = true;
 	char	*event_strings[] = {
 		[EVENT_FORK] = "has taken a fork",
 		[EVENT_EAT] = "is eating",
@@ -32,7 +34,13 @@ static void	print_event(size_t philosopher_index, t_event event)
 		[EVENT_DIED] = "died",
 	};
 
-	printf("%llu %zu %s\n", get_current_time(), philosopher_index, event_strings[event]);
+	pthread_mutex_lock(&data->printf_mutex);
+	// TODO: Do I need to do anything to make a billion% sure that get_time() - data->start_time won't ever underflow?
+	if (running)
+		printf("%llu %zu %s\n", get_time() - data->start_time, philosopher_index + 1, event_strings[event]);
+	if (event == EVENT_DIED)
+		running = false;
+	pthread_mutex_unlock(&data->printf_mutex);
 }
 
 static void	*run_philosopher(void *arg)
@@ -51,7 +59,7 @@ static void	*run_philosopher(void *arg)
 		}
 		pthread_mutex_unlock(&philosopher->data->running_philosophers_mutex); // TODO: Check for error?
 
-		usleep(100); // TODO: Change to better value
+		usleep(LOOP_USLEEP);
 	}
 
 	while (philosopher->data->running) // TODO: Wrap this in a mutex?
@@ -62,12 +70,13 @@ static void	*run_philosopher(void *arg)
 			{
 				// TODO: What to do in this case?
 			}
-			print_event(philosopher->index, EVENT_FORK);
+			print_event(philosopher->index, EVENT_FORK, philosopher->data);
+
 			if (pthread_mutex_lock(philosopher->right_fork) != 0)
 			{
 				// TODO: What to do in this case?
 			}
-			print_event(philosopher->index, EVENT_FORK);
+			print_event(philosopher->index, EVENT_FORK, philosopher->data);
 		}
 		else
 		{
@@ -75,19 +84,39 @@ static void	*run_philosopher(void *arg)
 			{
 				// TODO: What to do in this case?
 			}
-			print_event(philosopher->index, EVENT_FORK);
+			print_event(philosopher->index, EVENT_FORK, philosopher->data);
+
 			if (pthread_mutex_lock(philosopher->left_fork) != 0)
 			{
 				// TODO: What to do in this case?
 			}
-			print_event(philosopher->index, EVENT_FORK);
+			print_event(philosopher->index, EVENT_FORK, philosopher->data);
 		}
 
-		philosopher->time_of_last_meal = get_current_time();
+		print_event(philosopher->index, EVENT_EAT, philosopher->data);
 
-		usleep(1000000); // TODO: Change to better value
+		philosopher->time_of_last_meal = get_time();
 
-		// die if more than 10 ms passed
+		while (true)
+		{
+			pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+			if (!philosopher->data->running)
+			{
+				pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+				break;
+			}
+			pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+
+			// pthread_mutex_lock(&philosopher->data->printf_mutex);
+			// printf("%llu %llu\n", get_time() - philosopher->data->start_time, philosopher->data->time_to_eat);
+			// pthread_mutex_unlock(&philosopher->data->printf_mutex);
+
+			if (get_time() - philosopher->time_of_last_meal > philosopher->data->time_to_eat)
+			{
+				break;
+			}
+			usleep(LOOP_USLEEP);
+		}
 
 		// TODO: Does the unlocking need to occur in the same order as the locking? If so, then this won't work:
 
@@ -100,7 +129,8 @@ static void	*run_philosopher(void *arg)
 			// TODO: What to do in this case?
 		}
 
-		usleep(1000000); // TODO: Change to better value
+		// TODO: Do I need a usleep() here?
+		// usleep(1000000);
 	}
 
 	return (NULL);
@@ -122,7 +152,6 @@ static bool	create_philosophers(t_data *data)
 		philosopher = &data->philosophers[philosopher_index];
 
 		philosopher->index = philosopher_index;
-		philosopher->time_of_last_meal = get_current_time();
 
 		philosopher->left_fork = &data->forks[philosopher_index];
 		philosopher->right_fork = &data->forks[(philosopher_index + 1) % data->philosopher_count];
@@ -172,11 +201,14 @@ static void	run(t_data *data)
 		while (philosopher_index < data->philosopher_count)
 		{
 			philosopher = &data->philosophers[philosopher_index];
-			if (get_current_time() - philosopher->time_of_last_meal > 2000)
-			{
-				print_event(philosopher_index, EVENT_DIED);
 
+			if (get_time() - philosopher->time_of_last_meal > data->time_to_die)
+			{
+				print_event(philosopher_index, EVENT_DIED, data);
+
+				pthread_mutex_lock(&data->running_mutex); // TODO: Check for error?
 				data->running = false;
+				pthread_mutex_unlock(&data->running_mutex); // TODO: Check for error?
 
 				return ;
 			}
@@ -184,7 +216,25 @@ static void	run(t_data *data)
 			philosopher_index++;
 		}
 
-		usleep(1000); // TODO: Change to better value
+		usleep(LOOP_USLEEP);
+	}
+}
+
+static void	init_philosophers_time_of_last_meal(t_data *data)
+{
+	t_u64			time;
+	size_t			philosopher_index;
+	t_philosopher	*philosopher;
+
+	time = get_time();
+	data->start_time = time;
+
+	philosopher_index = 0;
+	while (philosopher_index < data->philosopher_count)
+	{
+		philosopher = &data->philosophers[philosopher_index];
+		philosopher->time_of_last_meal = time;
+		philosopher_index++;
 	}
 }
 
@@ -216,16 +266,65 @@ static bool	init(int argc, char *argv[], t_data *data)
 	data->forks = NULL;
 
 	data->running = true;
+	if (pthread_mutex_init(&data->running_mutex, NULL) != 0) // TODO: Are default attributes OK?
+	{
+		// TODO: Should this be doing anything else?
+		return (false);
+	}
 
-	t_i32	tentative_philosopher_count;
-	if (!ph_atoi_safe(argv[1], &tentative_philosopher_count))
+	if (pthread_mutex_init(&data->printf_mutex, NULL) != 0) // TODO: Are default attributes OK?
+	{
+		// TODO: Should this be doing anything else?
+		return (false);
+	}
+
+	// TODO: Throw an error in case an arg is < 0 or <= 0?
+
+	t_i32	nbr;
+	if (!ph_atoi_safe(argv[1], &nbr))
+	{
+		// TODO: Should this be returning EXIT_FAILURE?
+		// TODO: And should it also print an error message?
+		return (false);
+	}
+	data->philosopher_count = (size_t)nbr;
+	if (!ph_atoi_safe(argv[2], &nbr))
+	{
+		// TODO: Should this be returning EXIT_FAILURE?
+		// TODO: And should it also print an error message?
+		return (false);
+	}
+	data->time_to_die = (t_u64)nbr;
+	if (!ph_atoi_safe(argv[3], &nbr))
+	{
+		// TODO: Should this be returning EXIT_FAILURE?
+		// TODO: And should it also print an error message?
+		return (false);
+	}
+	data->time_to_eat = (t_u64)nbr;
+	if (!ph_atoi_safe(argv[4], &nbr))
 	{
 		// TODO: Should this be returning EXIT_FAILURE?
 		// TODO: And should it also print an error message?
 		return (false);
 	}
 
-	data->philosopher_count = (size_t)tentative_philosopher_count;
+	// TODO: What to do if this argument isn't given?
+	if (argc == 6)
+	{
+		data->time_to_sleep = (t_u64)nbr;
+		if (!ph_atoi_safe(argv[5], &nbr))
+		{
+			// TODO: Should this be returning EXIT_FAILURE?
+			// TODO: And should it also print an error message?
+			return (false);
+		}
+		data->number_of_times_each_philosopher_must_eat = (size_t)nbr;
+	}
+	else
+	{
+		data->number_of_times_each_philosopher_must_eat = 0;
+	}
 
 	if (!init_forks(data))
 	{
@@ -235,7 +334,6 @@ static bool	init(int argc, char *argv[], t_data *data)
 	}
 
 	data->running_philosophers = false;
-
 	if (pthread_mutex_init(&data->running_philosophers_mutex, NULL) != 0) // TODO: Are default attributes OK?
 	{
 		// TODO: Should this be doing anything else?
@@ -248,6 +346,8 @@ static bool	init(int argc, char *argv[], t_data *data)
 		// TODO: And should it also print an error message?
 		return (false);
 	}
+
+	init_philosophers_time_of_last_meal(data);
 
 	pthread_mutex_lock(&data->running_philosophers_mutex); // TODO: Check for error?
 	data->running_philosophers = true;

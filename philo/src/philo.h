@@ -22,6 +22,8 @@
 
 # include "types.h"
 
+# define LOOP_USLEEP 1000 // TODO: Better value
+
 typedef struct s_data	t_data;
 
 typedef struct s_philosopher
@@ -37,10 +39,21 @@ typedef struct s_philosopher
 typedef struct s_data
 {
 	bool			running;
-	// pthread_mutex_t	running_mutex;
+	pthread_mutex_t	running_mutex;
+
+	pthread_mutex_t	printf_mutex;
+
+	t_u64			start_time;
+
 	size_t			philosopher_count;
+	t_u64			time_to_die;
+	t_u64			time_to_eat;
+	t_u64			time_to_sleep;
+	size_t			number_of_times_each_philosopher_must_eat;
+
 	bool			running_philosophers;
 	pthread_mutex_t	running_philosophers_mutex;
+
 	t_philosopher	*philosophers;
 	pthread_mutex_t	*forks;
 }	t_data;

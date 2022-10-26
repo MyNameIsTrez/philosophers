@@ -12,7 +12,7 @@
 
 #include "philo.h"
 
-t_f64	get_current_ms_time(void)
+static t_f64	get_current_ms_time(void)
 {
 	struct timeval	tv;
 
@@ -44,7 +44,7 @@ static void	*run_philosopher(void *arg)
 
 	philosopher = arg;
 
-	while (true)
+	while (philosopher->data->running)
 	{
 		if ((philosopher->index & 1) == 0)
 		{
@@ -96,7 +96,7 @@ static void	*run_philosopher(void *arg)
 	return (NULL);
 }
 
-static t_philosopher	*create_philosophers(size_t philosopher_count, pthread_mutex_t *forks)
+static t_philosopher	*create_philosophers(size_t philosopher_count, pthread_mutex_t *forks, t_data *data)
 {
 	t_philosopher	*philosophers;
 	size_t			philosopher_index;
@@ -118,6 +118,8 @@ static t_philosopher	*create_philosophers(size_t philosopher_count, pthread_mute
 		philosopher->left_fork = &forks[philosopher_index];
 		philosopher->right_fork = &forks[(philosopher_index + 1) % philosopher_count];
 
+		philosopher->data = data;
+
 		if (pthread_create(&philosopher->thread, NULL, run_philosopher, philosopher) != 0) // TODO: Are default attributes OK?
 		{
 			// TODO: Free the previous philosophers when there's an error?
@@ -130,7 +132,7 @@ static t_philosopher	*create_philosophers(size_t philosopher_count, pthread_mute
 	return (philosophers);
 }
 
-pthread_mutex_t	*init_forks(size_t fork_count)
+static pthread_mutex_t	*init_forks(size_t fork_count)
 {
 	size_t			fork_index;
 	pthread_mutex_t	*forks;
@@ -150,10 +152,54 @@ pthread_mutex_t	*init_forks(size_t fork_count)
 	return (forks);
 }
 
+static void	run(t_philosopher *philosophers, size_t philosopher_count, t_data *data)
+{
+	while (true)
+	{
+		size_t	philosopher_index = 0;
+		while (philosopher_index < philosopher_count)
+		{
+			if (get_current_ms_time() - philosophers[philosopher_index].ms_time_of_last_meal > 2000)
+			{
+				printf("???philosopher %zu died???\n", philosopher_index);
+
+				data->running = false;
+
+				return ;
+			}
+
+			philosopher_index++;
+		}
+
+		usleep(1000); // TODO: Change to better value
+	}
+}
+
+static void	join_philosophers(t_philosopher *philosophers, size_t philosopher_count)
+{
+	size_t			philosopher_index;
+	t_philosopher	*philosopher;
+
+	philosopher_index = 0;
+	while (philosopher_index < philosopher_count)
+	{
+		philosopher = &philosophers[philosopher_index];
+		if (pthread_join(philosopher->thread, NULL) != 0) // TODO: Is having value_ptr at NULL ever not desired?
+		{
+			// TODO: ???
+		}
+		philosopher_index++;
+	}
+}
+
 int	main(int argc, char *argv[])
 {
 	// TODO: Check argc and argv
 	(void)argc;
+
+	t_data	data;
+
+	data.running = true;
 
 	t_i32	tentative_philosopher_count;
 	if (!ph_atoi_safe(argv[1], &tentative_philosopher_count))
@@ -175,7 +221,7 @@ int	main(int argc, char *argv[])
 	}
 
 	t_philosopher	*philosophers;
-	philosophers = create_philosophers(philosopher_count, forks);
+	philosophers = create_philosophers(philosopher_count, forks, &data);
 	if (philosophers == NULL)
 	{
 		// TODO: Should this be returning EXIT_FAILURE?
@@ -183,22 +229,9 @@ int	main(int argc, char *argv[])
 		return (EXIT_FAILURE);
 	}
 
-	while (true)
-	{
-		size_t	philosopher_index = 0;
-		while (philosopher_index < philosopher_count)
-		{
-			if (get_current_ms_time() - philosophers[philosopher_index].ms_time_of_last_meal > 3e3)
-			{
-				printf("???philosopher %zu died???\n", philosopher_index);
-				return (EXIT_FAILURE);
-			}
+	run(philosophers, philosopher_count, &data);
 
-			philosopher_index++;
-		}
-
-		usleep(1000); // TODO: Change to better value
-	}
+	join_philosophers(philosophers, philosopher_count);
 
 	return (EXIT_SUCCESS);
 }

@@ -22,12 +22,18 @@
 
 # include "types.h"
 
+typedef struct s_data
+{
+	bool	running;
+}	t_data;
+
 typedef struct s_philosopher
 {
 	size_t			index;
 	t_f64			ms_time_of_last_meal; // TODO: What type should I be using here?
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
+	t_data			*data;
 	pthread_t		thread; // TODO: Do I need to even store this at all?
 }	t_philosopher;
 

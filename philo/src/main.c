@@ -164,6 +164,8 @@ static void	*run_philosopher(void *arg)
 		// pthread_mutex_lock(&philosopher->data->printf_mutex);
 		// printf("%zu after sleeping\n", philosopher->index + 1);
 		// pthread_mutex_unlock(&philosopher->data->printf_mutex);
+
+		print_event(philosopher->index, EVENT_THINK, philosopher->data);
 	}
 
 	return (NULL);

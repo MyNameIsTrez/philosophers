@@ -48,7 +48,7 @@ typedef struct s_data
 	size_t			time_to_die;
 	size_t			time_to_eat;
 	size_t			time_to_sleep;
-	size_t			number_of_times_each_philosopher_must_eat;
+	size_t			times_to_eat;
 
 	bool			running_philosophers;
 	pthread_mutex_t	running_philosophers_mutex;

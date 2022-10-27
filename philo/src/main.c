@@ -139,8 +139,31 @@ static void	*run_philosopher(void *arg)
 			// TODO: What to do in this case?
 		}
 
-		// TODO: Do I need a usleep() here?
-		// usleep(1000000);
+		print_event(philosopher->index, EVENT_SLEEP, philosopher->data);
+
+		size_t	time_of_last_sleep;
+
+		time_of_last_sleep = get_time();
+
+		// pthread_mutex_lock(&philosopher->data->printf_mutex);
+		// printf("time to sleep: %zu\n", philosopher->data->time_to_sleep);
+		// pthread_mutex_unlock(&philosopher->data->printf_mutex);
+
+		while (true)
+		{
+			pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+			running = philosopher->data->running;
+			pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+
+			if (!running || get_time() - time_of_last_sleep > philosopher->data->time_to_sleep)
+				break;
+
+			usleep(LOOP_USLEEP);
+		}
+
+		// pthread_mutex_lock(&philosopher->data->printf_mutex);
+		// printf("%zu after sleeping\n", philosopher->index + 1);
+		// pthread_mutex_unlock(&philosopher->data->printf_mutex);
 	}
 
 	return (NULL);
@@ -330,22 +353,22 @@ static bool	init(int argc, char *argv[], t_data *data)
 		// TODO: And should it also print an error message?
 		return (false);
 	}
+	data->time_to_sleep = (size_t)nbr;
 
 	// TODO: What to do if this argument isn't given?
 	if (argc == 6)
 	{
-		data->time_to_sleep = (size_t)nbr;
 		if (!ph_atoi_safe(argv[5], &nbr))
 		{
 			// TODO: Should this be returning EXIT_FAILURE?
 			// TODO: And should it also print an error message?
 			return (false);
 		}
-		data->number_of_times_each_philosopher_must_eat = (size_t)nbr;
+		data->times_to_eat = (size_t)nbr;
 	}
 	else
 	{
-		data->number_of_times_each_philosopher_must_eat = 0;
+		data->times_to_eat = 0;
 	}
 
 	if (!init_forks(data))

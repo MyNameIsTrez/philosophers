@@ -290,7 +290,7 @@ static void	run(t_data *data)
 			philosopher_index++;
 		}
 
-		if (all_philosophers_done_eating)
+		if (all_philosophers_done_eating && data->times_to_eat > 0)
 			return ;
 
 		usleep(LOOP_USLEEP);

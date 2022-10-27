@@ -116,6 +116,11 @@ static void	*run_philosopher(void *arg)
 		philosopher->time_of_last_meal = get_time();
 		pthread_mutex_unlock(&philosopher->time_of_last_meal_mutex); // TODO: Check for error?
 
+		// TODO: This probably shouldn't happen when the philosopher hasn't eaten but is just quitting because another phil died.
+		pthread_mutex_lock(&philosopher->times_eaten_mutex); // TODO: Check for error?
+		philosopher->times_eaten++;
+		pthread_mutex_unlock(&philosopher->times_eaten_mutex); // TODO: Check for error?
+
 		while (true)
 		{
 			pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
@@ -188,6 +193,14 @@ static bool	create_philosophers(t_data *data)
 
 		philosopher->index = philosopher_index;
 
+		philosopher->times_eaten = 0;
+		if (pthread_mutex_init(&philosopher->times_eaten_mutex, NULL) != 0) // TODO: Are default attributes OK?
+		{
+			// TODO: Free the previous philosophers when there's an error?
+			// TODO: Should this also be destroying the previously init mutexes?
+			return (false);
+		}
+
 		philosopher->left_fork = &data->forks[philosopher_index];
 		philosopher->right_fork = &data->forks[(philosopher_index + 1) % data->philosopher_count];
 
@@ -232,36 +245,53 @@ static bool	init_forks(t_data *data)
 	return (true);
 }
 
+
+static bool	philosopher_starved(t_philosopher *philosopher)
+{
+	size_t	time_of_last_meal;
+	t_data	*data;
+
+	data = philosopher->data;
+
+	pthread_mutex_lock(&philosopher->time_of_last_meal_mutex); // TODO: Check for error?
+	time_of_last_meal = philosopher->time_of_last_meal;
+	pthread_mutex_unlock(&philosopher->time_of_last_meal_mutex); // TODO: Check for error?
+
+	return (get_time() - time_of_last_meal > data->time_to_die);
+}
+
 static void	run(t_data *data)
 {
 	size_t			philosopher_index;
 	t_philosopher	*philosopher;
-	size_t			time_of_last_meal;
+	bool			all_philosophers_done_eating;
+	size_t			times_eaten;
 
 	while (true)
 	{
+		all_philosophers_done_eating = true;
 		philosopher_index = 0;
 		while (philosopher_index < data->philosopher_count)
 		{
 			philosopher = &data->philosophers[philosopher_index];
 
-			pthread_mutex_lock(&philosopher->time_of_last_meal_mutex); // TODO: Check for error?
-			time_of_last_meal = philosopher->time_of_last_meal;
-			pthread_mutex_unlock(&philosopher->time_of_last_meal_mutex); // TODO: Check for error?
-
-			if (get_time() - time_of_last_meal > data->time_to_die)
+			if (philosopher_starved(philosopher))
 			{
-				print_event(philosopher_index, EVENT_DIED, data);
-
-				pthread_mutex_lock(&data->running_mutex); // TODO: Check for error?
-				data->running = false;
-				pthread_mutex_unlock(&data->running_mutex); // TODO: Check for error?
-
+				print_event(philosopher->index, EVENT_DIED, data);
 				return ;
 			}
 
+			pthread_mutex_lock(&philosopher->times_eaten_mutex); // TODO: Check for error?
+			times_eaten = philosopher->times_eaten;
+			pthread_mutex_unlock(&philosopher->times_eaten_mutex); // TODO: Check for error?
+			if (times_eaten < data->times_to_eat)
+				all_philosophers_done_eating = false;
+
 			philosopher_index++;
 		}
+
+		if (all_philosophers_done_eating)
+			return ;
 
 		usleep(LOOP_USLEEP);
 	}
@@ -411,6 +441,10 @@ int	main(int argc, char *argv[])
 		return (EXIT_FAILURE);
 
 	run(&data); // TODO: Wrap in error check if-statement?
+
+	pthread_mutex_lock(&data.running_mutex); // TODO: Check for error?
+	data.running = false;
+	pthread_mutex_unlock(&data.running_mutex); // TODO: Check for error?
 
 	join_philosophers(&data); // TODO: Wrap in error check if-statement?
 

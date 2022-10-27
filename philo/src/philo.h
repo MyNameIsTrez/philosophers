@@ -27,6 +27,8 @@ typedef struct s_data	t_data;
 typedef struct s_philosopher
 {
 	size_t			index;
+	size_t			times_eaten;
+	pthread_mutex_t	times_eaten_mutex;
 	size_t			time_of_last_meal; // TODO: What type should I be using here?
 	pthread_mutex_t	time_of_last_meal_mutex;
 	pthread_mutex_t	*left_fork;

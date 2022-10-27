@@ -28,6 +28,7 @@ typedef struct s_philosopher
 {
 	size_t			index;
 	size_t			time_of_last_meal; // TODO: What type should I be using here?
+	pthread_mutex_t	time_of_last_meal_mutex;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	t_data			*data;

@@ -6,7 +6,7 @@
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 17:15:55 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/02 15:06:24 by sbos          ########   odam.nl         */
+/*   Updated: 2022/11/02 15:35:20 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,27 @@ static size_t	get_time(void)
 	// TODO: What if tv.tv_ms is -1? (signed microseconds after all)
 
 	return ((size_t)tv.tv_sec * 1000 + (size_t)(tv.tv_usec / 1000));
+}
+
+static bool	is_running(t_philosopher *philosopher)
+{
+	bool	running;
+
+	pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+	running = philosopher->data->running;
+	pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+	return (running); // TODO: Should this check be done after every action below?
+}
+
+static void	precise_sleep(t_philosopher *philosopher, size_t start_time, size_t duration)
+{
+	while (true)
+	{
+		if (!is_running(philosopher) || get_time() - start_time > duration)
+			break ;
+
+		usleep(LOOP_USLEEP);
+	}
 }
 
 static void	print_event(size_t philosopher_index, t_event event, t_data *data)
@@ -43,16 +64,6 @@ static void	print_event(size_t philosopher_index, t_event event, t_data *data)
 	pthread_mutex_unlock(&data->printf_mutex);
 }
 
-static bool	is_running(t_philosopher *philosopher)
-{
-	bool	running;
-
-	pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
-	running = philosopher->data->running;
-	pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
-	return (running); // TODO: Should this check be done after every action below?
-}
-
 static void	run_single_philosopher_edgecase(t_philosopher *philosopher)
 {
 	if (!is_running(philosopher)) // TODO: Is this one necessary?
@@ -68,7 +79,7 @@ static void	run_single_philosopher_edgecase(t_philosopher *philosopher)
 	while (true)
 	{
 		if (!is_running(philosopher))
-			break;
+			break ;
 		usleep(LOOP_USLEEP);
 	}
 
@@ -81,20 +92,12 @@ static void	run_single_philosopher_edgecase(t_philosopher *philosopher)
 static void	run_regular_philosopher(t_philosopher *philosopher)
 {
 	if ((philosopher->index & 1) == 0)
-	{
-		while (true)
-		{
-			if (!is_running(philosopher) || get_time() - philosopher->time_of_last_meal > philosopher->data->time_to_eat / 2)
-				break;
-
-			usleep(LOOP_USLEEP);
-		}
-	}
+		precise_sleep(philosopher, philosopher->time_of_last_meal, philosopher->data->time_to_eat / 2);
 
 	while (true)
 	{
 		if (!is_running(philosopher)) // TODO: Should this check be done after every action below?
-			break;
+			break ;
 
 		if ((philosopher->index & 1) == 0)
 		{
@@ -160,13 +163,7 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 		philosopher->times_eaten++;
 		pthread_mutex_unlock(&philosopher->times_eaten_mutex); // TODO: Check for error?
 
-		while (true)
-		{
-			if (!is_running(philosopher) || get_time() - philosopher->time_of_last_meal > philosopher->data->time_to_eat)
-				break;
-
-			usleep(LOOP_USLEEP);
-		}
+		precise_sleep(philosopher, philosopher->time_of_last_meal, philosopher->data->time_to_eat);
 
 		// TODO: Does the unlocking need to occur in the same order as the locking? If so, then this won't work:
 
@@ -189,19 +186,16 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 		// printf("time to sleep: %zu\n", philosopher->data->time_to_sleep);
 		// pthread_mutex_unlock(&philosopher->data->printf_mutex);
 
-		while (true)
-		{
-			if (!is_running(philosopher) || get_time() - time_of_last_sleep > philosopher->data->time_to_sleep)
-				break;
-
-			usleep(LOOP_USLEEP);
-		}
+		precise_sleep(philosopher, time_of_last_sleep, philosopher->data->time_to_sleep);
 
 		// pthread_mutex_lock(&philosopher->data->printf_mutex);
 		// printf("%zu after sleeping\n", philosopher->index + 1);
 		// pthread_mutex_unlock(&philosopher->data->printf_mutex);
 
 		print_event(philosopher->index, EVENT_THINK, philosopher->data);
+
+		if ((philosopher->index & 1) == 1)
+			precise_sleep(philosopher, philosopher->time_of_last_meal, philosopher->data->time_to_eat / 2);
 	}
 }
 
@@ -219,7 +213,7 @@ static void	*run_philosopher(void *arg)
 		pthread_mutex_unlock(&philosopher->data->running_philosophers_mutex); // TODO: Check for error?
 
 		if (running_philosophers)
-			break;
+			break ;
 
 		usleep(LOOP_USLEEP);
 	}

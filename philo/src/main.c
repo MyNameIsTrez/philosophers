@@ -6,7 +6,7 @@
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 17:15:55 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/03 12:19:33 by sbos          ########   odam.nl         */
+/*   Updated: 2022/11/03 12:44:04 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,22 +23,17 @@ static size_t	get_time(void)
 	return ((size_t)tv.tv_sec * 1000 + (size_t)(tv.tv_usec / 1000));
 }
 
-static bool	is_running(t_philosopher *philosopher)
-{
-	bool	running;
-
-	pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
-	running = philosopher->data->running;
-	pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
-	return (running);
-}
-
 static void	precise_sleep(t_philosopher *philosopher, size_t start_time, size_t duration)
 {
 	while (true)
 	{
-		if (!is_running(philosopher) || get_time() - start_time > duration)
+		pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+		if (!philosopher->data->running || get_time() - start_time > duration)
+		{
+			pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
 			break ;
+		}
+		pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
 
 		usleep(LOOP_USLEEP);
 	}
@@ -94,8 +89,13 @@ static void	print_event(size_t philosopher_index, t_event event, t_data *data)
 
 static void	run_single_philosopher_edgecase(t_philosopher *philosopher)
 {
-	if (!is_running(philosopher)) // TODO: Is this one necessary?
+	pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+	if (!philosopher->data->running) // TODO: Is this one necessary?
+	{
+		pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
 		return ;
+	}
+	pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
 	
 	if (pthread_mutex_lock(philosopher->left_fork) != 0)
 	{
@@ -106,8 +106,13 @@ static void	run_single_philosopher_edgecase(t_philosopher *philosopher)
 
 	while (true)
 	{
-		if (!is_running(philosopher))
+		pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+		if (!philosopher->data->running)
+		{
+			pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
 			break ;
+		}
+		pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
 		usleep(LOOP_USLEEP);
 	}
 
@@ -124,8 +129,13 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 
 	while (true)
 	{
-		if (!is_running(philosopher)) // TODO: Should this check be done after every action below?
+		pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+		if (!philosopher->data->running) // TODO: Should this check be done after every action below?
+		{
+			pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
 			break ;
+		}
+		pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
 
 		if ((philosopher->index & 1) == 0)
 		{

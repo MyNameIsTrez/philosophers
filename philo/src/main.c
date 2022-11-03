@@ -6,7 +6,7 @@
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 17:15:55 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/03 13:46:45 by sbos          ########   odam.nl         */
+/*   Updated: 2022/11/03 13:53:50 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -322,8 +322,10 @@ static void	run(t_data *data)
 {
 	while (true)
 	{
+		if (any_philosopher_starved(data))
+			return ;
 		pthread_mutex_lock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
-		if (any_philosopher_starved(data) || data->philosophers_still_eating == 0)
+		if (data->philosophers_still_eating == 0)
 		{
 			pthread_mutex_unlock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
 			return ;

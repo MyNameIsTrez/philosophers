@@ -6,7 +6,7 @@
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 17:15:55 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/03 13:53:50 by sbos          ########   odam.nl         */
+/*   Updated: 2022/11/03 14:30:45 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 // In milliseconds
 static size_t	get_time(void)
 {
-	struct timeval	tv;
+	static struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
 	// TODO: What if tv.tv_ms is -1? (signed microseconds after all)
@@ -27,150 +27,132 @@ static void	precise_sleep(t_philosopher *philosopher, size_t start_time, size_t 
 {
 	while (true)
 	{
-		pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+		pthread_mutex_lock(&philosopher->data->running_mutex);
 		if (!philosopher->data->running || get_time() - start_time > duration)
 		{
-			pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+			pthread_mutex_unlock(&philosopher->data->running_mutex);
 			break ;
 		}
-		pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+		pthread_mutex_unlock(&philosopher->data->running_mutex);
 
 		usleep(LOOP_USLEEP);
 	}
 }
 
-static void	print_event(size_t philosopher_index, t_event event, t_data *data)
+static void	print_event(t_event event, t_philosopher *philosopher)
 {
 	static bool	printing = true;
-	char	*event_strings[] = {
+	static char	*event_strings[] = {
 		[EVENT_FORK] = "has taken a fork",
 		[EVENT_EAT] = "is eating",
 		[EVENT_SLEEP] = "is sleeping",
 		[EVENT_THINK] = "is thinking",
 		[EVENT_DIED] = "died",
 	};
+	t_data		*data;
 
+	data = philosopher->data;
 	pthread_mutex_lock(&data->printf_mutex);
 	// TODO: Do I need to do anything to make a morbillion% sure that get_time() - data->start_time won't ever underflow?
 	if (printing)
 	{
-		printf("%lu %zu %s\n", get_time() - data->start_time, philosopher_index + 1, event_strings[event]);
-		pthread_mutex_lock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
+		printf("%lu %zu %s\n", get_time() - data->start_time, philosopher->index + 1, event_strings[event]);
+		pthread_mutex_lock(&data->philosophers_still_eating_mutex);
 		if (event == EVENT_DIED || (event == EVENT_EAT && data->philosophers_still_eating == 0))
 			printing = false;
-		pthread_mutex_unlock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
+		pthread_mutex_unlock(&data->philosophers_still_eating_mutex);
 	}
 	pthread_mutex_unlock(&data->printf_mutex);
 }
 
 static void	run_single_philosopher_edgecase(t_philosopher *philosopher)
 {
-	pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+	pthread_mutex_lock(&philosopher->data->running_mutex);
 	if (!philosopher->data->running) // TODO: Is this one necessary?
 	{
-		pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+		pthread_mutex_unlock(&philosopher->data->running_mutex);
 		return ;
 	}
-	pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+	pthread_mutex_unlock(&philosopher->data->running_mutex);
 	
-	if (pthread_mutex_lock(philosopher->left_fork) != 0)
-	{
-		// TODO: What to do in this case?
-	}
+	pthread_mutex_lock(philosopher->left_fork);
 	
-	print_event(philosopher->index, EVENT_FORK, philosopher->data);
+	print_event(EVENT_FORK, philosopher);
 
 	while (true)
 	{
-		pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+		pthread_mutex_lock(&philosopher->data->running_mutex);
 		if (!philosopher->data->running)
 		{
-			pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+			pthread_mutex_unlock(&philosopher->data->running_mutex);
 			break ;
 		}
-		pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+		pthread_mutex_unlock(&philosopher->data->running_mutex);
 		usleep(LOOP_USLEEP);
 	}
 
-	if (pthread_mutex_unlock(philosopher->left_fork) != 0)
-	{
-		// TODO: What to do in this case?
-	}
+	pthread_mutex_unlock(philosopher->left_fork);
 }
 
 static void	run_regular_philosopher(t_philosopher *philosopher)
 {
-	if ((philosopher->index & 1) == 1)
+	if (philosopher->index % 2 == 1)
 		precise_sleep(philosopher, philosopher->time_of_last_meal, philosopher->data->time_to_eat / 2);
 
 	while (true)
 	{
-		pthread_mutex_lock(&philosopher->data->running_mutex); // TODO: Check for error?
+		pthread_mutex_lock(&philosopher->data->running_mutex);
 		if (!philosopher->data->running) // TODO: Should this check be done after every action below?
 		{
-			pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+			pthread_mutex_unlock(&philosopher->data->running_mutex);
 			break ;
 		}
-		pthread_mutex_unlock(&philosopher->data->running_mutex); // TODO: Check for error?
+		pthread_mutex_unlock(&philosopher->data->running_mutex);
 
-		if ((philosopher->index & 1) == 0)
+		if (philosopher->index % 2 == 0)
 		{
-			if (pthread_mutex_lock(philosopher->left_fork) != 0)
-			{
-				// TODO: What to do in this case?
-			}
-			print_event(philosopher->index, EVENT_FORK, philosopher->data);
+			pthread_mutex_lock(philosopher->left_fork);
 
-			if (pthread_mutex_lock(philosopher->right_fork) != 0)
-			{
-				// TODO: What to do in this case?
-			}
-			print_event(philosopher->index, EVENT_FORK, philosopher->data);
+			print_event(EVENT_FORK, philosopher);
+
+			pthread_mutex_lock(philosopher->right_fork);
+			
+			print_event(EVENT_FORK, philosopher);
 		}
 		else
 		{
-			if (pthread_mutex_lock(philosopher->right_fork) != 0)
-			{
-				// TODO: What to do in this case?
-			}
-			print_event(philosopher->index, EVENT_FORK, philosopher->data);
+			pthread_mutex_lock(philosopher->right_fork);
 
-			if (pthread_mutex_lock(philosopher->left_fork) != 0)
-			{
-				// TODO: What to do in this case?
-			}
-			print_event(philosopher->index, EVENT_FORK, philosopher->data);
+			print_event(EVENT_FORK, philosopher);
+
+			pthread_mutex_lock(philosopher->left_fork);
+
+			print_event(EVENT_FORK, philosopher);
 		}
 
 		// TODO: This probably shouldn't happen when the philosopher hasn't eaten but is just quitting because another phil died.
 		philosopher->times_eaten++;
 		if (philosopher->times_eaten == philosopher->data->times_to_eat)
 		{
-			pthread_mutex_lock(&philosopher->data->philosophers_still_eating_mutex); // TODO: Check for error?
+			pthread_mutex_lock(&philosopher->data->philosophers_still_eating_mutex);
 			philosopher->data->philosophers_still_eating--;
-			pthread_mutex_unlock(&philosopher->data->philosophers_still_eating_mutex); // TODO: Check for error?
+			pthread_mutex_unlock(&philosopher->data->philosophers_still_eating_mutex);
 		}
 
-		print_event(philosopher->index, EVENT_EAT, philosopher->data);
+		print_event(EVENT_EAT, philosopher);
 
-		pthread_mutex_lock(&philosopher->time_of_last_meal_mutex); // TODO: Check for error?
+		pthread_mutex_lock(&philosopher->time_of_last_meal_mutex);
 		philosopher->time_of_last_meal = get_time();
-		pthread_mutex_unlock(&philosopher->time_of_last_meal_mutex); // TODO: Check for error?
+		pthread_mutex_unlock(&philosopher->time_of_last_meal_mutex);
 
 		precise_sleep(philosopher, philosopher->time_of_last_meal, philosopher->data->time_to_eat);
 
 		// TODO: Does the unlocking need to occur in the same order as the locking? If so, then this won't work:
 
-		if (pthread_mutex_unlock(philosopher->left_fork) != 0)
-		{
-			// TODO: What to do in this case?
-		}
-		if (pthread_mutex_unlock(philosopher->right_fork) != 0)
-		{
-			// TODO: What to do in this case?
-		}
+		pthread_mutex_unlock(philosopher->left_fork);
+		pthread_mutex_unlock(philosopher->right_fork);
 
-		print_event(philosopher->index, EVENT_SLEEP, philosopher->data);
+		print_event(EVENT_SLEEP, philosopher);
 
 		size_t	time_of_last_sleep;
 
@@ -186,9 +168,9 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 		// printf("%zu after sleeping\n", philosopher->index + 1);
 		// pthread_mutex_unlock(&philosopher->data->printf_mutex);
 
-		print_event(philosopher->index, EVENT_THINK, philosopher->data);
+		print_event(EVENT_THINK, philosopher);
 
-		if ((philosopher->index & 1) == 0)
+		if (philosopher->data->philosopher_count % 2 == 1)
 			precise_sleep(philosopher, get_time(), philosopher->data->time_to_eat / 2);
 	}
 }
@@ -202,9 +184,9 @@ static void	*run_philosopher(void *arg)
 
 	while (true)
 	{
-		pthread_mutex_lock(&philosopher->data->running_philosophers_mutex); // TODO: Check for error?
+		pthread_mutex_lock(&philosopher->data->running_philosophers_mutex);
 		running_philosophers = philosopher->data->running_philosophers;
-		pthread_mutex_unlock(&philosopher->data->running_philosophers_mutex); // TODO: Check for error?
+		pthread_mutex_unlock(&philosopher->data->running_philosophers_mutex);
 
 		if (running_philosophers)
 			break ;
@@ -290,9 +272,9 @@ static bool	philosopher_starved(t_philosopher *philosopher)
 
 	data = philosopher->data;
 
-	pthread_mutex_lock(&philosopher->time_of_last_meal_mutex); // TODO: Check for error?
+	pthread_mutex_lock(&philosopher->time_of_last_meal_mutex);
 	time_of_last_meal = philosopher->time_of_last_meal;
-	pthread_mutex_unlock(&philosopher->time_of_last_meal_mutex); // TODO: Check for error?
+	pthread_mutex_unlock(&philosopher->time_of_last_meal_mutex);
 
 	return (get_time() - time_of_last_meal > data->time_to_die);
 }
@@ -309,7 +291,7 @@ static bool	any_philosopher_starved(t_data *data)
 
 		if (philosopher_starved(philosopher))
 		{
-			print_event(philosopher->index, EVENT_DIED, data);
+			print_event(EVENT_DIED, philosopher);
 			return (true);
 		}
 
@@ -324,13 +306,13 @@ static void	run(t_data *data)
 	{
 		if (any_philosopher_starved(data))
 			return ;
-		pthread_mutex_lock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
+		pthread_mutex_lock(&data->philosophers_still_eating_mutex);
 		if (data->philosophers_still_eating == 0)
 		{
-			pthread_mutex_unlock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
+			pthread_mutex_unlock(&data->philosophers_still_eating_mutex);
 			return ;
 		}
-		pthread_mutex_unlock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
+		pthread_mutex_unlock(&data->philosophers_still_eating_mutex);
 		usleep(LOOP_USLEEP);
 	}
 }
@@ -472,9 +454,9 @@ static bool	init(int argc, char *argv[], t_data *data)
 
 	init_philosophers_time_of_last_meal(data);
 
-	pthread_mutex_lock(&data->running_philosophers_mutex); // TODO: Check for error?
+	pthread_mutex_lock(&data->running_philosophers_mutex);
 	data->running_philosophers = true;
-	pthread_mutex_unlock(&data->running_philosophers_mutex); // TODO: Check for error?
+	pthread_mutex_unlock(&data->running_philosophers_mutex);
 
 	return (true);
 }
@@ -524,9 +506,9 @@ int	main(int argc, char *argv[])
 
 	run(&data); // TODO: Wrap in error check if-statement?
 
-	pthread_mutex_lock(&data.running_mutex); // TODO: Check for error?
+	pthread_mutex_lock(&data.running_mutex);
 	data.running = false;
-	pthread_mutex_unlock(&data.running_mutex); // TODO: Check for error?
+	pthread_mutex_unlock(&data.running_mutex);
 
 	join_philosophers(&data); // TODO: Wrap in error check if-statement?
 

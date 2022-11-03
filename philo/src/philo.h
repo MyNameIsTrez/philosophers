@@ -6,7 +6,7 @@
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 17:12:18 by sbos          #+#    #+#                 */
-/*   Updated: 2022/10/18 17:12:18 by sbos          ########   odam.nl         */
+/*   Updated: 2022/11/03 12:57:40 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ typedef struct s_philosopher
 {
 	size_t			index;
 	size_t			times_eaten;
-	pthread_mutex_t	times_eaten_mutex;
 	size_t			time_of_last_meal; // TODO: What type should I be using here?
 	pthread_mutex_t	time_of_last_meal_mutex;
 	pthread_mutex_t	*left_fork;
@@ -51,6 +50,9 @@ typedef struct s_data
 	size_t			time_to_eat;
 	size_t			time_to_sleep;
 	size_t			times_to_eat;
+
+	size_t			philosophers_still_eating;
+	pthread_mutex_t	philosophers_still_eating_mutex;
 
 	bool			running_philosophers;
 	pthread_mutex_t	running_philosophers_mutex;

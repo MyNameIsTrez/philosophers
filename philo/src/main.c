@@ -6,7 +6,7 @@
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 17:15:55 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/03 12:44:04 by sbos          ########   odam.nl         */
+/*   Updated: 2022/11/03 13:46:45 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,32 +39,6 @@ static void	precise_sleep(t_philosopher *philosopher, size_t start_time, size_t 
 	}
 }
 
-static bool	all_philosophers_done_eating(t_data *data)
-{
-	size_t			philosopher_index;
-	t_philosopher	*philosopher;
-	size_t			times_eaten;
-	
-	if (data->times_to_eat <= 0)
-		return (false);
-		
-	philosopher_index = 0;
-	while (philosopher_index < data->philosopher_count)
-	{
-		philosopher = &data->philosophers[philosopher_index];
-
-		pthread_mutex_lock(&philosopher->times_eaten_mutex); // TODO: Check for error?
-		times_eaten = philosopher->times_eaten;
-		pthread_mutex_unlock(&philosopher->times_eaten_mutex); // TODO: Check for error?
-		if (times_eaten < data->times_to_eat)
-			return (false);
-			
-		philosopher_index++;
-	}
-
-	return (true);
-}
-
 static void	print_event(size_t philosopher_index, t_event event, t_data *data)
 {
 	static bool	printing = true;
@@ -81,8 +55,10 @@ static void	print_event(size_t philosopher_index, t_event event, t_data *data)
 	if (printing)
 	{
 		printf("%lu %zu %s\n", get_time() - data->start_time, philosopher_index + 1, event_strings[event]);
-		if (event == EVENT_DIED) //|| (event == EVENT_EAT && all_philosophers_done_eating(data)))
+		pthread_mutex_lock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
+		if (event == EVENT_DIED || (event == EVENT_EAT && data->philosophers_still_eating == 0))
 			printing = false;
+		pthread_mutex_unlock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
 	}
 	pthread_mutex_unlock(&data->printf_mutex);
 }
@@ -167,9 +143,13 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 		}
 
 		// TODO: This probably shouldn't happen when the philosopher hasn't eaten but is just quitting because another phil died.
-		pthread_mutex_lock(&philosopher->times_eaten_mutex); // TODO: Check for error?
 		philosopher->times_eaten++;
-		pthread_mutex_unlock(&philosopher->times_eaten_mutex); // TODO: Check for error?
+		if (philosopher->times_eaten == philosopher->data->times_to_eat)
+		{
+			pthread_mutex_lock(&philosopher->data->philosophers_still_eating_mutex); // TODO: Check for error?
+			philosopher->data->philosophers_still_eating--;
+			pthread_mutex_unlock(&philosopher->data->philosophers_still_eating_mutex); // TODO: Check for error?
+		}
 
 		print_event(philosopher->index, EVENT_EAT, philosopher->data);
 
@@ -258,12 +238,6 @@ static bool	create_philosophers(t_data *data)
 		philosopher->index = philosopher_index;
 
 		philosopher->times_eaten = 0;
-		if (pthread_mutex_init(&philosopher->times_eaten_mutex, NULL) != 0) // TODO: Are default attributes OK?
-		{
-			// TODO: Free the previous philosophers when there's an error?
-			// TODO: Should this also be destroying the previously init mutexes?
-			return (false);
-		}
 
 		philosopher->left_fork = &data->forks[philosopher_index];
 		philosopher->right_fork = &data->forks[(philosopher_index + 1) % data->philosopher_count];
@@ -348,8 +322,13 @@ static void	run(t_data *data)
 {
 	while (true)
 	{
-		if (any_philosopher_starved(data) || all_philosophers_done_eating(data))
+		pthread_mutex_lock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
+		if (any_philosopher_starved(data) || data->philosophers_still_eating == 0)
+		{
+			pthread_mutex_unlock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
 			return ;
+		}
+		pthread_mutex_unlock(&data->philosophers_still_eating_mutex); // TODO: Check for error?
 		usleep(LOOP_USLEEP);
 	}
 }
@@ -466,6 +445,14 @@ static bool	init(int argc, char *argv[], t_data *data)
 		// TODO: And should it also print an error message?
 		return (false);
 	}
+	
+	data->philosophers_still_eating = data->philosopher_count;
+	if (pthread_mutex_init(&data->philosophers_still_eating_mutex, NULL) != 0) // TODO: Are default attributes OK?
+	{
+		// TODO: Free the previous philosophers when there's an error?
+		// TODO: Should this also be destroying the previously init mutexes?
+		return (false);
+	}
 
 	data->running_philosophers = false;
 	if (pthread_mutex_init(&data->running_philosophers_mutex, NULL) != 0) // TODO: Are default attributes OK?
@@ -511,7 +498,6 @@ static void	destroy_philosopher_mutexes(t_data *data)
 	while (philosopher_index < data->philosopher_count)
 	{
 		philosopher = &data->philosophers[philosopher_index];
-		pthread_mutex_destroy(&philosopher->times_eaten_mutex);
 		pthread_mutex_destroy(&philosopher->time_of_last_meal_mutex);
 		philosopher_index++;
 	}
@@ -523,6 +509,7 @@ static void	destroy_mutexes(t_data *data)
 	destroy_philosopher_mutexes(data);
 	pthread_mutex_destroy(&data->running_mutex);
 	pthread_mutex_destroy(&data->printf_mutex);
+	pthread_mutex_destroy(&data->philosophers_still_eating_mutex);
 	pthread_mutex_destroy(&data->running_philosophers_mutex);
 }
 

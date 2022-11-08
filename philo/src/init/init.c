@@ -17,7 +17,7 @@ static bool	create_philosophers(t_data *data)
 	size_t			philosopher_index;
 	t_philosopher	*philosopher;
 
-	data->philosophers = malloc(data->philosopher_count * sizeof(t_philosopher));
+	data->philosophers = malloc(data->philosopher_count * sizeof(*data->philosophers));
 	if (data->philosophers == NULL)
 		return (false);
 	philosopher_index = 0;
@@ -54,7 +54,7 @@ static bool	init_forks(t_data *data)
 	size_t	fork_index;
 
 	fork_index = 0;
-	data->forks = malloc(data->philosopher_count * sizeof(pthread_mutex_t));
+	data->forks = malloc(data->philosopher_count * sizeof(*data->forks));
 	if (data->forks == NULL)
 		return (false);
 
@@ -141,6 +141,9 @@ static void	init_philosophers_time_of_last_meal(t_data *data)
 
 bool	init(int argc, char *argv[], t_data *data)
 {
+	data->forks = NULL;
+	data->philosophers = NULL;
+
 	if (argc < 5 || argc > 6)
 		return (print_error(PH_ERROR_WRONG_ARGUMENT_COUNT));
 
@@ -148,9 +151,6 @@ bool	init(int argc, char *argv[], t_data *data)
 		return (print_error(PH_ERROR_INIT_MUTEX));
 
 	init_argv(argc, argv, data);
-
-	data->forks = NULL;
-	data->philosophers = NULL;
 
 	if (!init_forks(data))
 	{

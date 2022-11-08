@@ -14,6 +14,6 @@
 # define PH_MISC_H
 
 void	*run_philosopher(void *arg);
-void	run(t_data *data);
+void	run_main(t_data *data);
 
 #endif

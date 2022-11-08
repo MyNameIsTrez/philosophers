@@ -29,10 +29,10 @@ static void	join_philosophers(t_data *data)
 	}
 }
 
-// void	check_leaks(void)
-// {
-// 	system("leaks -q philo");
-// }
+void	check_leaks(void)
+{
+	system("leaks -q philo");
+}
 
 int	main(int argc, char *argv[])
 {
@@ -41,11 +41,11 @@ int	main(int argc, char *argv[])
 	if (!init(argc, argv, &data))
 	{
 		destroy(&data);
-		// atexit(check_leaks);
+		atexit(check_leaks); // TODO: REMOVE
 		return (EXIT_FAILURE);
 	}
 
-	run(&data); // TODO: Wrap in error check if-statement?
+	run_main(&data); // TODO: Wrap in error check if-statement?
 
 	mutex_lock(&data.running_mutex);
 	data.running = false;
@@ -55,7 +55,7 @@ int	main(int argc, char *argv[])
 
 	destroy(&data);
 
-	// atexit(check_leaks);
+	atexit(check_leaks); // TODO: REMOVE
 
 	return (EXIT_SUCCESS);
 }

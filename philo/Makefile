@@ -31,7 +31,8 @@ src/init/atoi_safe/atoi_range.c\
 src/init/atoi_safe/utils.c\
 src/init/atoi_safe.c\
 src/init/init.c\
-src/run/run.c\
+src/run/run_philosopher.c\
+src/run/run_main.c\
 src/utils/destroy.c\
 src/utils/mutex.c\
 src/utils/print.c\

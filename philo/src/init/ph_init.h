@@ -1,33 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   philo.h                                            :+:    :+:            */
+/*   ph_init.h                                          :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/10/18 17:12:18 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/08 13:01:13 by sbos          ########   odam.nl         */
+/*   Created: 2022/03/22 16:15:18 by sbos          #+#    #+#                 */
+/*   Updated: 2022/11/03 15:37:55 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_H
-# define PHILO_H
-
-# define LOOP_USLEEP 1000 // TODO: Better value
-
-# define PTHREAD_SUCCESS 0
-
-# include <stdlib.h>
-# include <stdbool.h>
-# include <pthread.h>
-# include <sys/time.h>
-# include <unistd.h>
-# include <stdio.h>
+#ifndef PH_INIT_H
+# define PH_INIT_H
 
 # include "ph_typedefs.h"
 
-# include "init/ph_init.h"
-# include "run/ph_run.h"
-# include "utils/ph_utils.h"
+bool	ph_atoi_safe(const char *str, int *nbr);
+bool	init(int argc, char *argv[], t_data *data);
 
 #endif

@@ -27,16 +27,25 @@ LIBS :=
 ################################################################################
 
 SOURCES :=\
-src/atoi_safe/private/atoi_range.c\
-src/atoi_safe/private/utils.c\
-src/atoi_safe/atoi_safe.c\
-src/error/write_error.c\
+src/init/atoi_safe/atoi_range.c\
+src/init/atoi_safe/utils.c\
+src/init/atoi_safe.c\
+src/init/init.c\
+src/run/run.c\
+src/utils/destroy.c\
+src/utils/mutex.c\
+src/utils/print.c\
+src/utils/time.c\
 src/main.c
 
 ################################################################################
 
 HEADERS +=\
-src/atoi_safe/private/ph_private_atoi_safe.h\
+src/init/atoi_safe/ph_private_atoi_safe.h\
+src/init/ph_init.h\
+src/run/ph_run.h\
+src/utils/ph_utils.h\
+src/ph_typedefs.h\
 src/philo.h
 
 ################################################################################

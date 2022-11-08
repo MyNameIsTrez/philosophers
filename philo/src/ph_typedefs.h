@@ -40,13 +40,13 @@ typedef struct s_philosopher
 	t_mutex		*left_fork;
 	t_mutex		*right_fork;
 	t_data		*data;
-	pthread_t	thread; // TODO: Do I need to even store this at all?
+	pthread_t	thread;
 }	t_philosopher;
 
 typedef struct s_data
 {
-	bool			running;
-	t_mutex			running_mutex;
+	bool			running_program;
+	t_mutex			running_program_mutex;
 
 	t_mutex			printf_mutex;
 

@@ -27,13 +27,13 @@ void	precise_sleep(t_philosopher *philosopher, t_time start_time, t_time duratio
 {
 	while (true)
 	{
-		mutex_lock(&philosopher->data->running_mutex);
-		if (!philosopher->data->running || get_time() - start_time > duration)
+		mutex_lock(&philosopher->data->running_program_mutex);
+		if (!philosopher->data->running_program || get_time() - start_time > duration)
 		{
-			mutex_unlock(&philosopher->data->running_mutex);
+			mutex_unlock(&philosopher->data->running_program_mutex);
 			break ;
 		}
-		mutex_unlock(&philosopher->data->running_mutex);
+		mutex_unlock(&philosopher->data->running_program_mutex);
 
 		usleep(LOOP_USLEEP);
 	}

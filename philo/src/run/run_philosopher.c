@@ -14,13 +14,13 @@
 
 static void	run_single_philosopher_edgecase(t_philosopher *philosopher)
 {
-	mutex_lock(&philosopher->data->running_mutex);
-	if (!philosopher->data->running) // TODO: Is this one necessary?
+	mutex_lock(&philosopher->data->running_program_mutex);
+	if (!philosopher->data->running_program) // TODO: Is this one necessary?
 	{
-		mutex_unlock(&philosopher->data->running_mutex);
+		mutex_unlock(&philosopher->data->running_program_mutex);
 		return ;
 	}
-	mutex_unlock(&philosopher->data->running_mutex);
+	mutex_unlock(&philosopher->data->running_program_mutex);
 
 	mutex_lock(philosopher->left_fork);
 
@@ -28,13 +28,13 @@ static void	run_single_philosopher_edgecase(t_philosopher *philosopher)
 
 	while (true)
 	{
-		mutex_lock(&philosopher->data->running_mutex);
-		if (!philosopher->data->running)
+		mutex_lock(&philosopher->data->running_program_mutex);
+		if (!philosopher->data->running_program)
 		{
-			mutex_unlock(&philosopher->data->running_mutex);
+			mutex_unlock(&philosopher->data->running_program_mutex);
 			break ;
 		}
-		mutex_unlock(&philosopher->data->running_mutex);
+		mutex_unlock(&philosopher->data->running_program_mutex);
 		usleep(LOOP_USLEEP);
 	}
 
@@ -48,13 +48,13 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 
 	while (true)
 	{
-		mutex_lock(&philosopher->data->running_mutex);
-		if (!philosopher->data->running) // TODO: Should this check be done after every action below?
+		mutex_lock(&philosopher->data->running_program_mutex);
+		if (!philosopher->data->running_program) // TODO: Should this check be done after every action below?
 		{
-			mutex_unlock(&philosopher->data->running_mutex);
+			mutex_unlock(&philosopher->data->running_program_mutex);
 			break ;
 		}
-		mutex_unlock(&philosopher->data->running_mutex);
+		mutex_unlock(&philosopher->data->running_program_mutex);
 
 		if (philosopher->index % 2 == 0)
 		{
@@ -125,18 +125,18 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 void	*run_philosopher(void *arg)
 {
 	t_philosopher	*philosopher;
-	bool			running_philosophers;
 
 	philosopher = arg;
 
 	while (true)
 	{
 		mutex_lock(&philosopher->data->running_philosophers_mutex);
-		running_philosophers = philosopher->data->running_philosophers;
-		mutex_unlock(&philosopher->data->running_philosophers_mutex);
-
-		if (running_philosophers)
+		if (philosopher->data->running_philosophers)
+		{
+			mutex_unlock(&philosopher->data->running_philosophers_mutex);
 			break ;
+		}
+		mutex_unlock(&philosopher->data->running_philosophers_mutex);
 
 		usleep(LOOP_USLEEP);
 	}

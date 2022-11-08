@@ -39,9 +39,14 @@ static bool	create_philosophers(t_data *data)
 		if (!mutex_init(&philosopher->time_of_last_meal_mutex))
 			return (false);
 
-		// TODO: pthread_join() the previous philosophers when there's an error!
 		if (pthread_create(&philosopher->thread, NULL, run_philosopher, philosopher) != PTHREAD_SUCCESS)
+		{
+			mutex_lock(&data->running_program_mutex);
+			data->running_program = false;
+			mutex_unlock(&data->running_program_mutex);
+			join_philosophers(philosopher_index, data);
 			return (false);
+		}
 
 		philosopher_index++;
 	}
@@ -115,11 +120,11 @@ static bool	init_argv(int argc, char *argv[], t_data *data)
 
 static bool	init_data_mutexes(t_data *data)
 {
-	data->running_mutex.initialized = false;
+	data->running_program_mutex.initialized = false;
 	data->printf_mutex.initialized = false;
 	data->philosophers_eating_mutex.initialized = false;
 	data->running_philosophers_mutex.initialized = false;
-	return (mutex_init(&data->running_mutex)
+	return (mutex_init(&data->running_program_mutex)
 		&& mutex_init(&data->printf_mutex)
 		&& mutex_init(&data->philosophers_eating_mutex)
 		&& mutex_init(&data->running_philosophers_mutex));
@@ -160,7 +165,7 @@ bool	init(int argc, char *argv[], t_data *data)
 	}
 
 	data->philosophers_eating = data->philosopher_count;
-	data->running = true;
+	data->running_program = true;
 	data->running_philosophers = false;
 
 	if (!create_philosophers(data))

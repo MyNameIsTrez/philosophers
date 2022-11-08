@@ -12,20 +12,6 @@
 
 #include "philo.h"
 
-static void	join_philosophers(t_data *data)
-{
-	size_t			philosopher_index;
-	t_philosopher	*philosopher;
-
-	philosopher_index = 0;
-	while (philosopher_index < data->philosopher_count)
-	{
-		philosopher = &data->philosophers[philosopher_index];
-		pthread_join(philosopher->thread, NULL);
-		philosopher_index++;
-	}
-}
-
 void	check_leaks(void)
 {
 	system("leaks -q philo");
@@ -37,18 +23,21 @@ int	main(int argc, char *argv[])
 
 	if (!init(argc, argv, &data))
 	{
+		mutex_lock(&data.running_program_mutex);
+		data.running_program = false;
+		mutex_unlock(&data.running_program_mutex);
 		destroy(&data);
 		atexit(check_leaks); // TODO: REMOVE
 		return (EXIT_FAILURE);
 	}
 
-	run_main(&data);
+	main_loop(&data);
 
-	mutex_lock(&data.running_mutex);
-	data.running = false;
-	mutex_unlock(&data.running_mutex);
+	mutex_lock(&data.running_program_mutex);
+	data.running_program = false;
+	mutex_unlock(&data.running_program_mutex);
 
-	join_philosophers(&data);
+	join_philosophers(data.philosopher_count, &data);
 
 	destroy(&data);
 

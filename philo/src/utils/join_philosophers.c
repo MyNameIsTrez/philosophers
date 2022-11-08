@@ -1,19 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   ph_run.h                                           :+:    :+:            */
+/*   pthread.c                                          :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/11/08 13:22:34 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/08 13:23:08 by sbos          ########   odam.nl         */
+/*   Created: 2022/11/08 16:55:29 by sbos          #+#    #+#                 */
+/*   Updated: 2022/11/08 16:55:29 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PH_MISC_H
-# define PH_MISC_H
+#include "philo.h"
 
-void	*run_philosopher(void *arg);
-void	main_loop(t_data *data);
+void	join_philosophers(size_t count, t_data *data)
+{
+	size_t			philosopher_index;
+	t_philosopher	*philosopher;
 
-#endif
+	philosopher_index = 0;
+	while (philosopher_index < count)
+	{
+		philosopher = &data->philosophers[philosopher_index];
+		pthread_join(philosopher->thread, NULL);
+		philosopher_index++;
+	}
+}

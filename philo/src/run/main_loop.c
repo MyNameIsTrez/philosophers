@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   run_main.c                                         :+:    :+:            */
+/*   main_loop.c                                        :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/11/08 15:03:44 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/08 15:03:44 by sbos          ########   odam.nl         */
+/*   Created: 2022/11/08 17:09:14 by sbos          #+#    #+#                 */
+/*   Updated: 2022/11/08 17:09:14 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static bool	any_philosopher_starved(t_data *data)
 	return (false);
 }
 
-void	run_main(t_data *data)
+void	main_loop(t_data *data)
 {
 	while (true)
 	{

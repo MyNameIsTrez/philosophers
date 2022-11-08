@@ -6,7 +6,7 @@
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 17:12:18 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/03 12:57:40 by sbos          ########   odam.nl         */
+/*   Updated: 2022/11/08 12:14:58 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,28 +20,36 @@
 # include <unistd.h>
 # include <stdio.h>
 
+# include "error/ph_error.h"
+
 # define LOOP_USLEEP 1000 // TODO: Better value
 
 typedef struct s_data	t_data;
 
+typedef struct s_mutex
+{
+	pthread_mutex_t	mutex;
+	bool			initialized;
+}	t_mutex;
+
 typedef struct s_philosopher
 {
-	size_t			index;
-	size_t			times_eaten;
-	size_t			time_of_last_meal; // TODO: What type should I be using here?
-	pthread_mutex_t	time_of_last_meal_mutex;
-	pthread_mutex_t	*left_fork;
-	pthread_mutex_t	*right_fork;
-	t_data			*data;
-	pthread_t		thread; // TODO: Do I need to even store this at all?
+	size_t		index;
+	size_t		times_eaten;
+	size_t		time_of_last_meal; // TODO: What type should I be using here?
+	t_mutex		time_of_last_meal_mutex;
+	t_mutex		*left_fork;
+	t_mutex		*right_fork;
+	t_data		*data;
+	pthread_t	thread; // TODO: Do I need to even store this at all?
 }	t_philosopher;
 
 typedef struct s_data
 {
 	bool			running;
-	pthread_mutex_t	running_mutex;
+	t_mutex			running_mutex;
 
-	pthread_mutex_t	printf_mutex;
+	t_mutex			printf_mutex;
 
 	size_t			start_time;
 
@@ -51,14 +59,14 @@ typedef struct s_data
 	size_t			time_to_sleep;
 	size_t			times_to_eat;
 
-	size_t			philosophers_still_eating;
-	pthread_mutex_t	philosophers_still_eating_mutex;
+	size_t			philosopher_count_eating;
+	t_mutex			philosopher_count_eating_mutex;
 
 	bool			running_philosophers;
-	pthread_mutex_t	running_philosophers_mutex;
+	t_mutex			running_philosophers_mutex;
 
 	t_philosopher	*philosophers;
-	pthread_mutex_t	*forks;
+	t_mutex			*forks;
 }	t_data;
 
 typedef enum s_event

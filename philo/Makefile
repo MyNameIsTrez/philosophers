@@ -6,7 +6,7 @@
 #    By: sbos <sbos@student.codam.nl>                 +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/08/31 17:51:35 by sbos          #+#    #+#                  #
-#    Updated: 2022/09/01 16:11:12 by sbos          ########   odam.nl          #
+#    Updated: 2022/11/03 15:00:49 by sbos          ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,6 +30,7 @@ SOURCES :=\
 src/atoi_safe/private/atoi_range.c\
 src/atoi_safe/private/utils.c\
 src/atoi_safe/atoi_safe.c\
+src/error/write_error.c\
 src/main.c
 
 ################################################################################

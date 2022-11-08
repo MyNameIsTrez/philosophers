@@ -12,21 +12,6 @@
 
 #include "philo.h"
 
-static bool	philosopher_starved(t_philosopher *philosopher)
-{
-	t_time	time_of_last_meal;
-	t_data	*data;
-
-	data = philosopher->data;
-
-	// TODO: This is a race condition since time_of_last_meal may change during this function
-	mutex_lock(&philosopher->time_of_last_meal_mutex);
-	time_of_last_meal = philosopher->time_of_last_meal;
-	mutex_unlock(&philosopher->time_of_last_meal_mutex);
-
-	return (get_time() - time_of_last_meal > data->time_to_die);
-}
-
 static bool	any_philosopher_starved(t_data *data)
 {
 	size_t			philosopher_index;
@@ -37,11 +22,14 @@ static bool	any_philosopher_starved(t_data *data)
 	{
 		philosopher = &data->philosophers[philosopher_index];
 
-		if (philosopher_starved(philosopher))
+		mutex_lock(&philosopher->time_of_last_meal_mutex);
+		if (get_time() - philosopher->time_of_last_meal > data->time_to_die)
 		{
+			mutex_unlock(&philosopher->time_of_last_meal_mutex);
 			print_event(EVENT_DIED, philosopher);
 			return (true);
 		}
+		mutex_unlock(&philosopher->time_of_last_meal_mutex);
 
 		philosopher_index++;
 	}

@@ -86,19 +86,19 @@ static bool	init_argv(int argc, char *argv[], t_data *data)
 		// TODO: Should this print an error message?
 		return (false);
 	}
-	data->time_to_die = (size_t)nbr;
+	data->time_to_die = (t_time)nbr;
 	if (!ph_atoi_safe(argv[3], &nbr))
 	{
 		// TODO: Should this print an error message?
 		return (false);
 	}
-	data->time_to_eat = (size_t)nbr;
+	data->time_to_eat = (t_time)nbr;
 	if (!ph_atoi_safe(argv[4], &nbr))
 	{
 		// TODO: Should this print an error message?
 		return (false);
 	}
-	data->time_to_sleep = (size_t)nbr;
+	data->time_to_sleep = (t_time)nbr;
 
 	data->times_to_eat = 0;
 	if (argc == 6)

@@ -13,17 +13,17 @@
 #include "philo.h"
 
 // In milliseconds
-size_t	get_time(void)
+t_time	get_time(void)
 {
 	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
 	// TODO: What if tv.tv_ms is -1? (signed microseconds after all)
 
-	return ((size_t)tv.tv_sec * 1000 + (size_t)(tv.tv_usec / 1000));
+	return ((t_time)tv.tv_sec * 1000 + (t_time)(tv.tv_usec / 1000));
 }
 
-void	precise_sleep(t_philosopher *philosopher, size_t start_time, size_t duration)
+void	precise_sleep(t_philosopher *philosopher, t_time start_time, t_time duration)
 {
 	while (true)
 	{

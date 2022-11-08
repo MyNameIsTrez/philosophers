@@ -101,7 +101,7 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 
 		print_event(EVENT_SLEEP, philosopher);
 
-		size_t	time_of_last_sleep;
+		t_time	time_of_last_sleep;
 
 		time_of_last_sleep = get_time();
 

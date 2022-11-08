@@ -13,6 +13,8 @@
 #ifndef PH_TYPEDEFS_H
 # define PH_TYPEDEFS_H
 
+typedef size_t	t_time;
+
 typedef enum s_event
 {
 	EVENT_FORK,
@@ -33,7 +35,7 @@ typedef struct s_philosopher
 {
 	size_t		index;
 	size_t		times_eaten;
-	size_t		time_of_last_meal; // TODO: What type should I be using here?
+	t_time		time_of_last_meal;
 	t_mutex		time_of_last_meal_mutex;
 	t_mutex		*left_fork;
 	t_mutex		*right_fork;
@@ -48,12 +50,12 @@ typedef struct s_data
 
 	t_mutex			printf_mutex;
 
-	size_t			start_time;
+	t_time			start_time;
 
 	size_t			philosopher_count;
-	size_t			time_to_die;
-	size_t			time_to_eat;
-	size_t			time_to_sleep;
+	t_time			time_to_die;
+	t_time			time_to_eat;
+	t_time			time_to_sleep;
 	size_t			times_to_eat;
 
 	size_t			philosophers_eating;

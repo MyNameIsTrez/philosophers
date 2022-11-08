@@ -14,7 +14,7 @@
 
 static bool	philosopher_starved(t_philosopher *philosopher)
 {
-	size_t	time_of_last_meal;
+	t_time	time_of_last_meal;
 	t_data	*data;
 
 	data = philosopher->data;

@@ -21,10 +21,7 @@ static void	join_philosophers(t_data *data)
 	while (philosopher_index < data->philosopher_count)
 	{
 		philosopher = &data->philosophers[philosopher_index];
-		if (pthread_join(philosopher->thread, NULL) != PTHREAD_SUCCESS) // TODO: Is having value_ptr at NULL ever not desired?
-		{
-			// TODO: ???
-		}
+		pthread_join(philosopher->thread, NULL);
 		philosopher_index++;
 	}
 }
@@ -45,13 +42,13 @@ int	main(int argc, char *argv[])
 		return (EXIT_FAILURE);
 	}
 
-	run_main(&data); // TODO: Wrap in error check if-statement?
+	run_main(&data);
 
 	mutex_lock(&data.running_mutex);
 	data.running = false;
 	mutex_unlock(&data.running_mutex);
 
-	join_philosophers(&data); // TODO: Wrap in error check if-statement?
+	join_philosophers(&data);
 
 	destroy(&data);
 

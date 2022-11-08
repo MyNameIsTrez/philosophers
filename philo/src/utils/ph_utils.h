@@ -31,8 +31,8 @@ bool	mutex_init(t_mutex *mutex_ptr);
 bool	print_error(t_ph_error ph_error);
 void	print_event(t_event event, t_philosopher *philosopher);
 
-size_t	get_time(void);
-void	precise_sleep(t_philosopher *philosopher, size_t start_time,
-			size_t duration);
+t_time	get_time(void);
+void	precise_sleep(t_philosopher *philosopher, t_time start_time,
+			t_time duration);
 
 #endif

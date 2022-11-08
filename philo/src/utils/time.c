@@ -15,7 +15,7 @@
 // In milliseconds
 size_t	get_time(void)
 {
-	static struct timeval	tv;
+	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
 	// TODO: What if tv.tv_ms is -1? (signed microseconds after all)

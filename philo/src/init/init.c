@@ -20,8 +20,16 @@ static bool	create_philosophers(t_data *data)
 	data->philosophers = malloc(data->philosopher_count * sizeof(*data->philosophers));
 	if (data->philosophers == NULL)
 		return (false);
-	philosopher_index = 0;
 
+	philosopher_index = 0;
+	while (philosopher_index < data->philosopher_count)
+	{
+		philosopher = &data->philosophers[philosopher_index];
+		philosopher->time_of_last_meal_mutex.initialized = false;
+		philosopher_index++;
+	}
+
+	philosopher_index = 0;
 	while (philosopher_index < data->philosopher_count)
 	{
 		philosopher = &data->philosophers[philosopher_index];
@@ -35,7 +43,6 @@ static bool	create_philosophers(t_data *data)
 
 		philosopher->data = data;
 
-		philosopher->time_of_last_meal_mutex.initialized = false;
 		if (!mutex_init(&philosopher->time_of_last_meal_mutex))
 			return (false);
 
@@ -58,14 +65,20 @@ static bool	init_forks(t_data *data)
 {
 	size_t	fork_index;
 
-	fork_index = 0;
 	data->forks = malloc(data->philosopher_count * sizeof(*data->forks));
 	if (data->forks == NULL)
 		return (false);
 
+	fork_index = 0;
 	while (fork_index < data->philosopher_count)
 	{
 		data->forks[fork_index].initialized = false;
+		fork_index++;
+	}
+
+	fork_index = 0;
+	while (fork_index < data->philosopher_count)
+	{
 		if (!mutex_init(&data->forks[fork_index]))
 			return (false);
 		fork_index++;

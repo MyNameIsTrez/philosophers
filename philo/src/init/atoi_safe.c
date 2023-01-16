@@ -23,14 +23,15 @@
  *
  * @param str May start with whitespace, and the first encountered number will
  * be converted to a int.
- * @param nbr The int will be put in here.
+ * @param size_ptr The size result will be put in here.
  * The dereferenced value won't be touched if no number was found in the string.
  * @return true if a number was found in @p str, false otherwise.
  */
-bool	ph_atoi_safe(const char *str, int *nbr)
+bool	ph_str_to_size(const char *str, size_t *size_ptr)
 {
 	bool	out_of_range;
-	int	i;
+	int		i;
+	int		range_result;
 
 	i = 0;
 	while (ph_isspace(str[i]))
@@ -41,9 +42,10 @@ bool	ph_atoi_safe(const char *str, int *nbr)
 		i++;
 	if (!ph_isdigit(str[i]))
 		return (false);
-	*nbr = ph_atoi_range(str, &out_of_range);
-	if (out_of_range)
+	range_result = ph_atoi_range(str, &out_of_range);
+	if (out_of_range || range_result <= 0)
 		return (false);
+	*size_ptr = (size_t)range_result;
 	while (ph_isdigit(str[i]))
 		i++;
 	while (ph_isspace(str[i]))

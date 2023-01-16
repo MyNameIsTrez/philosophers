@@ -15,7 +15,7 @@
 
 # include "ph_typedefs.h"
 
-bool	ph_atoi_safe(const char *str, int *nbr);
+bool	ph_str_to_size(const char *str, size_t *size_ptr);
 bool	init(int argc, char *argv[], t_data *data);
 
 #endif

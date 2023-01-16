@@ -89,44 +89,15 @@ static bool	init_forks(t_data *data)
 
 static bool	init_argv(int argc, char *argv[], t_data *data)
 {
-	int	nbr;
-
-	// TODO: Throw an error in case an arg is < 0 or <= 0?
-
-	if (!ph_atoi_safe(argv[1], &nbr))
-	{
-		// TODO: Should this print an error message?
-		return (false);
-	}
-	data->philosopher_count = (size_t)nbr;
-	if (!ph_atoi_safe(argv[2], &nbr))
-	{
-		// TODO: Should this print an error message?
-		return (false);
-	}
-	data->time_to_die = (t_time)nbr;
-	if (!ph_atoi_safe(argv[3], &nbr))
-	{
-		// TODO: Should this print an error message?
-		return (false);
-	}
-	data->time_to_eat = (t_time)nbr;
-	if (!ph_atoi_safe(argv[4], &nbr))
-	{
-		// TODO: Should this print an error message?
-		return (false);
-	}
-	data->time_to_sleep = (t_time)nbr;
-
 	data->times_to_eat = 0;
-	if (argc == 6)
+	if (!ph_str_to_size(argv[1], &data->philosopher_count)
+	|| !ph_str_to_size(argv[2], &data->time_to_die)
+	|| !ph_str_to_size(argv[3], &data->time_to_eat)
+	|| !ph_str_to_size(argv[4], &data->time_to_sleep)
+	|| (argc == 6 && !ph_str_to_size(argv[5], &data->times_to_eat)))
 	{
-		if (!ph_atoi_safe(argv[5], &nbr))
-		{
-			// TODO: Should this print an error message?
-			return (false);
-		}
-		data->times_to_eat = (size_t)nbr;
+		printf("Error: Expected a natural number.\n");
+		return (false);
 	}
 	return (true);
 }

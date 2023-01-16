@@ -133,6 +133,8 @@ bool	init(int argc, char *argv[], t_data *data)
 	data->forks = NULL;
 	data->philosophers = NULL;
 
+	memset(data, 0, sizeof(*data));
+
 	if (argc < 5 || argc > 6)
 		return (print_error(PH_ERROR_WRONG_ARGUMENT_COUNT));
 

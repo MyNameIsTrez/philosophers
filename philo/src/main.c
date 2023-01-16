@@ -12,10 +12,10 @@
 
 #include "philo.h"
 
-void	check_leaks(void)
-{
-	system("leaks -q philo");
-}
+// void	check_leaks(void)
+// {
+// 	system("leaks -q philo");
+// }
 
 int	main(int argc, char *argv[])
 {
@@ -23,11 +23,8 @@ int	main(int argc, char *argv[])
 
 	if (!init(argc, argv, &data))
 	{
-		mutex_lock(&data.running_program_mutex);
-		data.running_program = false;
-		mutex_unlock(&data.running_program_mutex);
 		destroy(&data);
-		atexit(check_leaks); // TODO: REMOVE
+		// atexit(check_leaks); // TODO: REMOVE
 		return (EXIT_FAILURE);
 	}
 
@@ -41,7 +38,7 @@ int	main(int argc, char *argv[])
 
 	destroy(&data);
 
-	atexit(check_leaks); // TODO: REMOVE
+	// atexit(check_leaks); // TODO: REMOVE
 
 	return (EXIT_SUCCESS);
 }

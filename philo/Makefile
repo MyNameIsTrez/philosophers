@@ -18,6 +18,7 @@ CC := cc
 
 OBJ_DIR := obj
 
+# TODO: Remove extra flags
 CFLAGS := -Wall -Wextra -Werror -Wconversion -Wpedantic -Wfatal-errors -pthread
 
 ################################################################################

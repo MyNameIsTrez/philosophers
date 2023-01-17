@@ -96,7 +96,7 @@ static bool	init_argv(int argc, char *argv[], t_data *data)
 	|| !ph_str_to_size(argv[4], &data->time_to_sleep)
 	|| (argc == 6 && !ph_str_to_size(argv[5], &data->times_to_eat)))
 	{
-		printf("Error: Expected a natural number.\n");
+		print_error(PH_ERROR_EXPECTED_NATURAL_NUMBER);
 		return (false);
 	}
 	return (true);
@@ -145,7 +145,6 @@ bool	init(int argc, char *argv[], t_data *data)
 
 	if (!init_forks(data))
 	{
-		// TODO: Should this be returning EXIT_FAILURE?
 		// TODO: And should it also print an error message?
 		return (false);
 	}
@@ -156,7 +155,6 @@ bool	init(int argc, char *argv[], t_data *data)
 
 	if (!create_philosophers(data))
 	{
-		// TODO: Should this be returning EXIT_FAILURE?
 		// TODO: And should it also print an error message?
 		return (false);
 	}

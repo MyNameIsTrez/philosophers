@@ -19,6 +19,7 @@ typedef enum e_ph_error
 {
 	PH_ERROR_WRONG_ARGUMENT_COUNT,
 	PH_ERROR_INIT_MUTEX,
+	PH_ERROR_EXPECTED_NATURAL_NUMBER,
 }	t_ph_error;
 
 void	destroy(t_data *data);

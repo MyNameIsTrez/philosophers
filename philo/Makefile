@@ -36,7 +36,8 @@ src/run/run_philosopher.c\
 src/run/main_loop.c\
 src/utils/destroy.c\
 src/utils/mutex.c\
-src/utils/print.c\
+src/utils/print_error.c\
+src/utils/print_event.c\
 src/utils/join_philosophers.c\
 src/utils/time.c\
 src/main.c

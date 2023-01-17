@@ -34,7 +34,7 @@ size_t	ph_strlen(const char *str);
 
 void	join_philosophers(size_t count, t_data *data);
 
-t_time	get_time(void);
+t_time	get_time_ms(void);
 void	precise_sleep(t_philosopher *philosopher, t_time start_time,
 			t_time duration);
 

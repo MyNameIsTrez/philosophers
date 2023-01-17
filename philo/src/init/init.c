@@ -151,7 +151,7 @@ bool	init(int argc, char *argv[], t_data *data)
 	if (!create_philosophers(data))
 		return (print_error(ERROR_SYSTEM));
 
-	data->start_time = get_time();
+	data->start_time = get_time_ms();
 	init_philosophers_time_of_last_meal(data);
 
 	mutex_lock(&data->running_philosophers_mutex);

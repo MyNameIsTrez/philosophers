@@ -12,14 +12,11 @@
 
 #include "philo.h"
 
-// In milliseconds
-t_time	get_time(void)
+t_time	get_time_ms(void)
 {
 	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
-	// TODO: What if tv.tv_ms is -1? (signed microseconds after all)
-
 	return ((t_time)tv.tv_sec * 1000 + (t_time)(tv.tv_usec / 1000));
 }
 
@@ -28,7 +25,7 @@ void	precise_sleep(t_philosopher *philosopher, t_time start_time, t_time duratio
 	while (true)
 	{
 		mutex_lock(&philosopher->data->running_program_mutex);
-		if (!philosopher->data->running_program || get_time() - start_time > duration)
+		if (!philosopher->data->running_program || get_time_ms() - start_time > duration)
 		{
 			mutex_unlock(&philosopher->data->running_program_mutex);
 			break ;

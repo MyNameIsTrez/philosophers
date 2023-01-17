@@ -27,18 +27,12 @@ int	main(int argc, char *argv[])
 		// atexit(check_leaks); // TODO: REMOVE
 		return (EXIT_FAILURE);
 	}
-
 	main_loop(&data);
-
 	mutex_lock(&data.running_program_mutex);
 	data.running_program = false;
 	mutex_unlock(&data.running_program_mutex);
-
 	join_philosophers(data.philosopher_count, &data);
-
 	destroy(&data);
-
 	// atexit(check_leaks); // TODO: REMOVE
-
 	return (EXIT_SUCCESS);
 }

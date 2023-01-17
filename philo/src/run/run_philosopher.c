@@ -89,7 +89,7 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 		print_event(EVENT_EAT, philosopher);
 
 		mutex_lock(&philosopher->time_of_last_meal_mutex);
-		philosopher->time_of_last_meal = get_time();
+		philosopher->time_of_last_meal = get_time_ms();
 		mutex_unlock(&philosopher->time_of_last_meal_mutex);
 
 		precise_sleep(philosopher, philosopher->time_of_last_meal, philosopher->data->time_to_eat);
@@ -103,7 +103,7 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 
 		t_time	time_of_last_sleep;
 
-		time_of_last_sleep = get_time();
+		time_of_last_sleep = get_time_ms();
 
 		// mutex_lock(&philosopher->data->printf_mutex);
 		// printf("time to sleep: %zu\n", philosopher->data->time_to_sleep);
@@ -118,7 +118,7 @@ static void	run_regular_philosopher(t_philosopher *philosopher)
 		print_event(EVENT_THINK, philosopher);
 
 		if (philosopher->data->philosopher_count % 2 == 1)
-			precise_sleep(philosopher, get_time(), philosopher->data->time_to_eat / 2);
+			precise_sleep(philosopher, get_time_ms(), philosopher->data->time_to_eat / 2);
 	}
 }
 

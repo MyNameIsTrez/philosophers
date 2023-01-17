@@ -14,14 +14,15 @@
 
 bool	print_error(t_error ph_error)
 {
-	char*	error_messages[] = {
-		[PH_ERROR_WRONG_ARGUMENT_COUNT] = "Wrong argument count",
-        [PH_ERROR_INIT_MUTEX] = "A mutex init failed",
-		[PH_ERROR_EXPECTED_NATURAL_NUMBER] = "Expected a natural number",
+	static char	*error_messages[] = {
+	[PH_ERROR_WRONG_ARGUMENT_COUNT] = "Wrong argument count",
+	[PH_ERROR_INIT_MUTEX] = "A mutex init failed",
+	[PH_ERROR_EXPECTED_NATURAL_NUMBER] = "Expected a natural number",
+	[PH_ERROR_SYSTEM] = "System error"
 	};
-    char	*error_message;
+	char		*error_message;
 
-    error_message = error_messages[ph_error];
+	error_message = error_messages[ph_error];
 	write(STDERR_FILENO, "Error: ", 7);
 	write(STDERR_FILENO, error_message, ph_strlen(error_message));
 	write(STDERR_FILENO, ".\n", 2);

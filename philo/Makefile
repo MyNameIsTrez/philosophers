@@ -32,14 +32,14 @@ src/init/get_size/atoi_range.c\
 src/init/get_size/utils.c\
 src/init/get_size.c\
 src/init/init.c\
-src/run/run_philosopher.c\
 src/run/main_loop.c\
+src/run/run_philosopher.c\
 src/utils/destroy.c\
+src/utils/join_philosophers.c\
 src/utils/mutex.c\
 src/utils/print_error.c\
 src/utils/print_event.c\
 src/utils/strlen.c\
-src/utils/join_philosophers.c\
 src/utils/time.c\
 src/main.c
 

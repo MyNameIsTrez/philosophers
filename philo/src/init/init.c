@@ -17,7 +17,8 @@ static bool	create_philosophers(t_data *data)
 	size_t			philosopher_index;
 	t_philosopher	*philosopher;
 
-	data->philosophers = malloc(data->philosopher_count * sizeof(*data->philosophers));
+	data->philosophers = malloc(
+			data->philosopher_count * sizeof(*data->philosophers));
 	if (data->philosophers == NULL)
 		return (false);
 
@@ -91,14 +92,11 @@ static bool	init_argv(int argc, char *argv[], t_data *data)
 {
 	data->times_to_eat = 0;
 	if (!ph_get_size(argv[1], &data->philosopher_count)
-	|| !ph_get_size(argv[2], &data->time_to_die)
-	|| !ph_get_size(argv[3], &data->time_to_eat)
-	|| !ph_get_size(argv[4], &data->time_to_sleep)
-	|| (argc == 6 && !ph_get_size(argv[5], &data->times_to_eat)))
-	{
-		print_error(PH_ERROR_EXPECTED_NATURAL_NUMBER);
-		return (false);
-	}
+		|| !ph_get_size(argv[2], &data->time_to_die)
+		|| !ph_get_size(argv[3], &data->time_to_eat)
+		|| !ph_get_size(argv[4], &data->time_to_sleep)
+		|| (argc == 6 && !ph_get_size(argv[5], &data->times_to_eat)))
+		return (print_error(PH_ERROR_EXPECTED_NATURAL_NUMBER));
 	return (true);
 }
 
@@ -144,20 +142,14 @@ bool	init(int argc, char *argv[], t_data *data)
 	init_argv(argc, argv, data);
 
 	if (!init_forks(data))
-	{
-		// TODO: And should it also print an error message?
-		return (false);
-	}
+		return (print_error(PH_ERROR_SYSTEM));
 
 	data->philosophers_eating = data->philosopher_count;
 	data->running_program = true;
 	data->running_philosophers = false;
 
 	if (!create_philosophers(data))
-	{
-		// TODO: And should it also print an error message?
-		return (false);
-	}
+		return (print_error(PH_ERROR_SYSTEM));
 
 	data->start_time = get_time();
 	init_philosophers_time_of_last_meal(data);

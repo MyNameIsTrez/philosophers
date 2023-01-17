@@ -115,14 +115,12 @@ static void	run_regular_philosopher(t_philosopher *philosopher, t_data *data)
 	}
 }
 
-void	*run_philosopher(void *pthread_args)
+void	*run_philosopher(void *_philosopher)
 {
-	t_pthread_args	*_pthread_args;
 	t_philosopher	*philosopher;
 	t_data			*data;
 
-	_pthread_args = pthread_args;
-	philosopher = _pthread_args->philosopher;
+	philosopher = _philosopher;
 	data = philosopher->data;
 	while (true)
 	{

@@ -60,10 +60,4 @@ struct s_philosopher
 	t_data		*data;
 };
 
-struct s_pthread_args
-{
-	t_philosopher	*philosopher;
-	t_data			*data;
-};
-
 #endif

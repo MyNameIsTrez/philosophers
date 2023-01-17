@@ -20,7 +20,6 @@ typedef size_t					t_time;
 typedef struct s_data			t_data;
 typedef struct s_philosopher	t_philosopher;
 typedef struct s_mutex			t_mutex;
-typedef struct s_pthread_args	t_pthread_args;
 
 // TODO: Put these functions in a logical order
 void		destroy(t_data *data);

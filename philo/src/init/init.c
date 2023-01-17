@@ -24,7 +24,7 @@ static bool	initialize_philosopher(t_philosopher *philosopher,
 	if (!mutex_init(&philosopher->time_of_last_meal_mutex))
 		return (print_error(ERROR_SYSTEM));
 	if (pthread_create(&philosopher->thread, NULL, run_philosopher,
-			&(t_pthread_args){philosopher, data}) != PTHREAD_SUCCESS)
+			philosopher) != PTHREAD_SUCCESS)
 	{
 		mutex_lock(&data->running_program_mutex);
 		data->running_program = false;

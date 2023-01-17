@@ -30,8 +30,9 @@ LIBS :=
 SOURCES :=\
 src/init/parse_size/atoi_range.c\
 src/init/parse_size/utils.c\
-src/init/parse_size.c\
 src/init/init.c\
+src/init/parse_size.c\
+src/init/philosophers.c\
 src/run/run_philosopher.c\
 src/run/run.c\
 src/utils/destroy.c\

@@ -51,4 +51,8 @@ bool	parse_size(const char *str, size_t *size_ptr)
 bool	init(int argc, char *argv[], t_data *data)
 		__attribute__((warn_unused_result));
 
+void	init_philosophers_time_of_last_meal(t_data *data);
+bool	create_philosophers(t_data *data)
+		__attribute__((warn_unused_result));
+
 #endif

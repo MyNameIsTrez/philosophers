@@ -20,6 +20,7 @@ static bool	initialize_philosopher(t_philosopher *philosopher,
 	philosopher->left_fork = &data->forks[philosopher_index];
 	philosopher->right_fork = &data->forks[
 		(philosopher_index + 1) % data->philosopher_count];
+	philosopher->data = data;
 	if (!mutex_init(&philosopher->time_of_last_meal_mutex))
 		return (print_error(ERROR_SYSTEM));
 	if (pthread_create(&philosopher->thread, NULL, run_philosopher,

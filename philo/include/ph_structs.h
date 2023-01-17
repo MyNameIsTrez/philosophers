@@ -57,6 +57,7 @@ struct s_philosopher
 	t_mutex		*left_fork;
 	t_mutex		*right_fork;
 	pthread_t	thread;
+	t_data		*data;
 };
 
 struct s_pthread_args

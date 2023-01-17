@@ -117,11 +117,13 @@ static void	run_regular_philosopher(t_philosopher *philosopher, t_data *data)
 
 void	*run_philosopher(void *pthread_args)
 {
+	t_pthread_args	*_pthread_args;
 	t_philosopher	*philosopher;
 	t_data			*data;
 
-	philosopher = ((t_pthread_args *)pthread_args)->philosopher;
-	data = ((t_pthread_args *)pthread_args)->data;
+	_pthread_args = pthread_args;
+	philosopher = _pthread_args->philosopher;
+	data = philosopher->data;
 	while (true)
 	{
 		mutex_lock(&data->running_philosophers_mutex);

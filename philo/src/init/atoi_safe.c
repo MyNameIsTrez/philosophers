@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-#include "atoi_safe/ph_private_atoi_safe.h"
+#include "ph_private_atoi_safe.h"
 
 /**
  * @brief Converts @p str to a int and puts it in the pointer @p nbr.

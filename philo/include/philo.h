@@ -27,8 +27,8 @@
 
 # include "ph_typedefs.h"
 
-# include "init/ph_init.h"
-# include "run/ph_run.h"
-# include "utils/ph_utils.h"
+# include "ph_init.h"
+# include "ph_run.h"
+# include "ph_utils.h"
 
 #endif

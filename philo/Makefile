@@ -45,12 +45,12 @@ src/main.c
 ################################################################################
 
 HEADERS +=\
-src/init/atoi_safe/ph_private_atoi_safe.h\
-src/init/ph_init.h\
-src/run/ph_run.h\
-src/utils/ph_utils.h\
-src/ph_typedefs.h\
-src/philo.h
+include/ph_init.h\
+include/ph_private_atoi_safe.h\
+include/ph_run.h\
+include/ph_typedefs.h\
+include/ph_utils.h\
+include/philo.h
 
 ################################################################################
 
@@ -84,7 +84,7 @@ endif
 
 ################################################################################
 
-INCLUDES := $(sort $(addprefix -I, src))
+INCLUDES := $(sort $(addprefix -I, include))
 
 ################################################################################
 

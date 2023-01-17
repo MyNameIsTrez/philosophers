@@ -91,12 +91,12 @@ static bool	init_forks(t_data *data)
 static bool	init_argv(int argc, char *argv[], t_data *data)
 {
 	data->times_to_eat = 0;
-	if (!ph_get_size(argv[1], &data->philosopher_count)
-		|| !ph_get_size(argv[2], &data->time_to_die)
-		|| !ph_get_size(argv[3], &data->time_to_eat)
-		|| !ph_get_size(argv[4], &data->time_to_sleep)
-		|| (argc == 6 && !ph_get_size(argv[5], &data->times_to_eat)))
-		return (print_error(PH_ERROR_EXPECTED_NATURAL_NUMBER));
+	if (!get_size(argv[1], &data->philosopher_count)
+		|| !get_size(argv[2], &data->time_to_die)
+		|| !get_size(argv[3], &data->time_to_eat)
+		|| !get_size(argv[4], &data->time_to_sleep)
+		|| (argc == 6 && !get_size(argv[5], &data->times_to_eat)))
+		return (print_error(ERROR_EXPECTED_NATURAL_NUMBER));
 	return (true);
 }
 
@@ -134,22 +134,22 @@ bool	init(int argc, char *argv[], t_data *data)
 	memset(data, 0, sizeof(*data));
 
 	if (argc < 5 || argc > 6)
-		return (print_error(PH_ERROR_WRONG_ARGUMENT_COUNT));
+		return (print_error(ERROR_WRONG_ARGUMENT_COUNT));
 
 	if (!init_data_mutexes(data))
-		return (print_error(PH_ERROR_INIT_MUTEX));
+		return (print_error(ERROR_INIT_MUTEX));
 
 	init_argv(argc, argv, data);
 
 	if (!init_forks(data))
-		return (print_error(PH_ERROR_SYSTEM));
+		return (print_error(ERROR_SYSTEM));
 
 	data->philosophers_eating = data->philosopher_count;
 	data->running_program = true;
 	data->running_philosophers = false;
 
 	if (!create_philosophers(data))
-		return (print_error(PH_ERROR_SYSTEM));
+		return (print_error(ERROR_SYSTEM));
 
 	data->start_time = get_time();
 	init_philosophers_time_of_last_meal(data);

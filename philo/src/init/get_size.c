@@ -27,7 +27,7 @@
  * The dereferenced value won't be touched if no number was found in the string.
  * @return true if a number was found in @p str, false otherwise.
  */
-bool	ph_get_size(const char *str, size_t *size_ptr)
+bool	get_size(const char *str, size_t *size_ptr)
 {
 	bool	out_of_range;
 	int		i;

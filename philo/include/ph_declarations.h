@@ -41,7 +41,7 @@ void	precise_sleep(t_philosopher *philosopher, t_time start_time,
 void	*run_philosopher(void *arg);
 void	main_loop(t_data *data);
 
-bool	ph_get_size(const char *str, size_t *size_ptr);
+bool	get_size(const char *str, size_t *size_ptr);
 bool	init(int argc, char *argv[], t_data *data);
 
 #endif

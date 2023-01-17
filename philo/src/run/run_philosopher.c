@@ -22,11 +22,8 @@ static void	run_single_philosopher_edgecase(t_philosopher *philosopher,
 		return ;
 	}
 	mutex_unlock(&data->running_program_mutex);
-
 	mutex_lock(philosopher->left_fork);
-
 	print_event(EVENT_FORK, philosopher, data);
-
 	while (true)
 	{
 		mutex_lock(&data->running_program_mutex);
@@ -38,13 +35,11 @@ static void	run_single_philosopher_edgecase(t_philosopher *philosopher,
 		mutex_unlock(&data->running_program_mutex);
 		usleep(LOOP_USLEEP);
 	}
-
 	mutex_unlock(philosopher->left_fork);
 }
 
 static void	run_regular_philosopher(t_philosopher *philosopher, t_data *data)
 {
-	// TODO: Does time_of_last_meal need a mutex around it?
 	if (philosopher->index % 2 == 1)
 		precise_sleep(philosopher->time_of_last_meal, data->time_to_eat / 2, data);
 
@@ -94,7 +89,6 @@ static void	run_regular_philosopher(t_philosopher *philosopher, t_data *data)
 		philosopher->time_of_last_meal = get_time_ms();
 		mutex_unlock(&philosopher->time_of_last_meal_mutex);
 
-		// TODO: Does time_of_last_meal need a mutex around it?
 		precise_sleep(philosopher->time_of_last_meal, data->time_to_eat, data);
 
 		// TODO: Does the unlocking need to occur in the same order as the locking? If so, then this won't work:
@@ -137,14 +131,11 @@ void	*run_philosopher(void *pthread_args)
 			break ;
 		}
 		mutex_unlock(&data->running_philosophers_mutex);
-
 		usleep(LOOP_USLEEP);
 	}
-
 	if (data->philosopher_count == 1)
 		run_single_philosopher_edgecase(philosopher, data);
 	else
 		run_regular_philosopher(philosopher, data);
-
 	return (NULL);
 }

@@ -20,17 +20,17 @@ t_time	get_time_ms(void)
 	return ((t_time)tv.tv_sec * 1000 + (t_time)(tv.tv_usec / 1000));
 }
 
-void	precise_sleep(t_philosopher *philosopher, t_time start_time, t_time duration)
+void	precise_sleep(t_time start_time, t_time duration, t_data *data)
 {
 	while (true)
 	{
-		mutex_lock(&philosopher->data->running_program_mutex);
-		if (!philosopher->data->running_program || get_time_ms() - start_time > duration)
+		mutex_lock(&data->running_program_mutex);
+		if (!data->running_program || get_time_ms() - start_time > duration)
 		{
-			mutex_unlock(&philosopher->data->running_program_mutex);
+			mutex_unlock(&data->running_program_mutex);
 			break ;
 		}
-		mutex_unlock(&philosopher->data->running_program_mutex);
+		mutex_unlock(&data->running_program_mutex);
 
 		usleep(LOOP_USLEEP);
 	}

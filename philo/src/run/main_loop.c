@@ -26,7 +26,7 @@ static bool	any_philosopher_starved(t_data *data)
 		if (get_time_ms() - philosopher->time_of_last_meal > data->time_to_die)
 		{
 			mutex_unlock(&philosopher->time_of_last_meal_mutex);
-			print_event(EVENT_DIED, philosopher);
+			print_event(EVENT_DIED, philosopher, data);
 			return (true);
 		}
 		mutex_unlock(&philosopher->time_of_last_meal_mutex);

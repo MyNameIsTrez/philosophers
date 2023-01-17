@@ -42,12 +42,11 @@ static bool	create_philosophers(t_data *data)
 		philosopher->left_fork = &data->forks[philosopher_index];
 		philosopher->right_fork = &data->forks[(philosopher_index + 1) % data->philosopher_count];
 
-		philosopher->data = data;
-
 		if (!mutex_init(&philosopher->time_of_last_meal_mutex))
 			return (false);
 
-		if (pthread_create(&philosopher->thread, NULL, run_philosopher, philosopher) != PTHREAD_SUCCESS)
+		// TODO: The & of t_pthread_args may lead to issues since it's not in a variable?
+		if (pthread_create(&philosopher->thread, NULL, run_philosopher, &(t_pthread_args){philosopher, data}) != PTHREAD_SUCCESS)
 		{
 			mutex_lock(&data->running_program_mutex);
 			data->running_program = false;

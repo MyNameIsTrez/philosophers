@@ -12,7 +12,7 @@
 
 #include "philo.h"
 
-void	print_event(t_event event, t_philosopher *philosopher)
+void	print_event(t_event event, t_philosopher *philosopher, t_data *data)
 {
 	static bool	printing = true;
 	static char	*event_strings[] = {
@@ -22,9 +22,7 @@ void	print_event(t_event event, t_philosopher *philosopher)
 		[EVENT_THINK] = "is thinking",
 		[EVENT_DIED] = "died",
 	};
-	t_data		*data;
 
-	data = philosopher->data;
 	mutex_lock(&data->printf_mutex);
 	// TODO: Do I need to do anything to make a morbillion% sure that get_time_ms() - data->start_time won't ever underflow?
 	if (printing)

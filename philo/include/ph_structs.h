@@ -21,18 +21,6 @@ struct s_mutex
 	bool			initialized;
 };
 
-struct s_philosopher
-{
-	size_t		index;
-	size_t		times_eaten;
-	t_time		time_of_last_meal;
-	t_mutex		time_of_last_meal_mutex;
-	t_mutex		*left_fork;
-	t_mutex		*right_fork;
-	t_data		*data;
-	pthread_t	thread;
-};
-
 struct s_data
 {
 	bool			running_program;
@@ -56,6 +44,23 @@ struct s_data
 
 	t_philosopher	*philosophers;
 	t_mutex			*forks;
+};
+
+struct s_philosopher
+{
+	size_t		index;
+	size_t		times_eaten;
+	t_time		time_of_last_meal;
+	t_mutex		time_of_last_meal_mutex;
+	t_mutex		*left_fork;
+	t_mutex		*right_fork;
+	pthread_t	thread;
+};
+
+struct s_pthread_args
+{
+	t_philosopher	*philosopher;
+	t_data			*data;
 };
 
 #endif

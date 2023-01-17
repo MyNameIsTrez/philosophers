@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   atoi_safe.c                                        :+:    :+:            */
+/*   get_size.c                                         :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-#include "ph_private_atoi_safe.h"
+#include "ph_get_size.h"
 
 /**
  * @brief Converts @p str to a int and puts it in the pointer @p nbr.
@@ -27,7 +27,7 @@
  * The dereferenced value won't be touched if no number was found in the string.
  * @return true if a number was found in @p str, false otherwise.
  */
-bool	ph_str_to_size(const char *str, size_t *size_ptr)
+bool	ph_get_size(const char *str, size_t *size_ptr)
 {
 	bool	out_of_range;
 	int		i;

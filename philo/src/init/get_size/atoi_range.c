@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-#include "ph_private_atoi_safe.h"
+#include "ph_get_size.h"
 
 static int	char_to_digit(const char chr)
 {

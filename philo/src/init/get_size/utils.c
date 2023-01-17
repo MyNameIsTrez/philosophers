@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-#include "ph_private_atoi_safe.h"
+#include "ph_get_size.h"
 
-void	*ph_memchr(const void *ptr, int chr, size_t len)
+static void	*ph_memchr(const void *ptr, int chr, size_t len)
 {
 	unsigned char	*ptr_;
 	unsigned char	chr_;
@@ -31,17 +31,7 @@ void	*ph_memchr(const void *ptr, int chr, size_t len)
 	return (NULL);
 }
 
-size_t	ph_strlen(const char *str)
-{
-	size_t	len;
-
-	len = 0;
-	while (str[len] != '\0')
-		len++;
-	return (len);
-}
-
-char	*ph_strchr(const char *str, int chr)
+static char	*ph_strchr(const char *str, int chr)
 {
 	return (ph_memchr(str, chr, ph_strlen(str) + 1));
 }

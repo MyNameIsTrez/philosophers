@@ -1,19 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   ph_run.h                                           :+:    :+:            */
+/*   strlen.c                                           :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/11/08 13:22:34 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/08 13:23:08 by sbos          ########   odam.nl         */
+/*   Created: 2023/01/17 16:02:46 by sbos          #+#    #+#                 */
+/*   Updated: 2023/01/17 16:02:46 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PH_MISC_H
-# define PH_MISC_H
+#include "philo.h"
 
-void	*run_philosopher(void *arg);
-void	main_loop(t_data *data);
+size_t	ph_strlen(const char *str)
+{
+	size_t	len;
 
-#endif
+	len = 0;
+	while (str[len] != '\0')
+		len++;
+	return (len);
+}

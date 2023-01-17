@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   ph_typedefs.h                                      :+:    :+:            */
+/*   ph_structs.h                                       :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
@@ -10,28 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PH_TYPEDEFS_H
-# define PH_TYPEDEFS_H
+#ifndef PH_STRUCTS_H
+# define PH_STRUCTS_H
 
-typedef size_t	t_time;
+# include "ph_declarations.h"
 
-typedef enum s_event
-{
-	EVENT_FORK,
-	EVENT_EAT,
-	EVENT_SLEEP,
-	EVENT_THINK,
-	EVENT_DIED,
-}	t_event;
-
-typedef struct s_mutex
+struct s_mutex
 {
 	pthread_mutex_t	mutex;
 	bool			initialized;
-}	t_mutex;
+};
 
-typedef struct s_data	t_data;
-typedef struct s_philosopher
+struct s_philosopher
 {
 	size_t		index;
 	size_t		times_eaten;
@@ -41,9 +31,9 @@ typedef struct s_philosopher
 	t_mutex		*right_fork;
 	t_data		*data;
 	pthread_t	thread;
-}	t_philosopher;
+};
 
-typedef struct s_data
+struct s_data
 {
 	bool			running_program;
 	t_mutex			running_program_mutex;
@@ -66,6 +56,6 @@ typedef struct s_data
 
 	t_philosopher	*philosophers;
 	t_mutex			*forks;
-}	t_data;
+};
 
 #endif

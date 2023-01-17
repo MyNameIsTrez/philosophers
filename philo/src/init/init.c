@@ -90,11 +90,11 @@ static bool	init_forks(t_data *data)
 static bool	init_argv(int argc, char *argv[], t_data *data)
 {
 	data->times_to_eat = 0;
-	if (!ph_str_to_size(argv[1], &data->philosopher_count)
-	|| !ph_str_to_size(argv[2], &data->time_to_die)
-	|| !ph_str_to_size(argv[3], &data->time_to_eat)
-	|| !ph_str_to_size(argv[4], &data->time_to_sleep)
-	|| (argc == 6 && !ph_str_to_size(argv[5], &data->times_to_eat)))
+	if (!ph_get_size(argv[1], &data->philosopher_count)
+	|| !ph_get_size(argv[2], &data->time_to_die)
+	|| !ph_get_size(argv[3], &data->time_to_eat)
+	|| !ph_get_size(argv[4], &data->time_to_sleep)
+	|| (argc == 6 && !ph_get_size(argv[5], &data->times_to_eat)))
 	{
 		print_error(PH_ERROR_EXPECTED_NATURAL_NUMBER);
 		return (false);

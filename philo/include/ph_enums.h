@@ -1,21 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   ph_init.h                                          :+:    :+:            */
+/*   ph_enums.h                                         :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/03/22 16:15:18 by sbos          #+#    #+#                 */
-/*   Updated: 2022/11/03 15:37:55 by sbos          ########   odam.nl         */
+/*   Created: 2022/11/08 15:16:30 by sbos          #+#    #+#                 */
+/*   Updated: 2022/11/08 15:16:30 by sbos          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PH_INIT_H
-# define PH_INIT_H
+#ifndef PH_ENUMS_H
+# define PH_ENUMS_H
 
-# include "ph_typedefs.h"
+typedef enum e_event
+{
+	EVENT_FORK,
+	EVENT_EAT,
+	EVENT_SLEEP,
+	EVENT_THINK,
+	EVENT_DIED,
+}	t_event;
 
-bool	ph_str_to_size(const char *str, size_t *size_ptr);
-bool	init(int argc, char *argv[], t_data *data);
+typedef enum e_error
+{
+	PH_ERROR_WRONG_ARGUMENT_COUNT,
+	PH_ERROR_INIT_MUTEX,
+	PH_ERROR_EXPECTED_NATURAL_NUMBER,
+}	t_error;
 
 #endif

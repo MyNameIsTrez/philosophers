@@ -12,17 +12,7 @@
 
 #include "philo.h"
 
-static size_t	ph_strlen(char *str)
-{
-    size_t	i;
-
-    i = 0;
-    while (str[i] != '\0')
-        i++;
-    return (i);
-}
-
-bool	print_error(t_ph_error ph_error)
+bool	print_error(t_error ph_error)
 {
 	char*	error_messages[] = {
 		[PH_ERROR_WRONG_ARGUMENT_COUNT] = "Wrong argument count",

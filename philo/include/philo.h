@@ -14,7 +14,6 @@
 # define PHILO_H
 
 # define LOOP_USLEEP 1000 // TODO: Better value
-
 # define PTHREAD_SUCCESS 0
 
 # include <stdlib.h>
@@ -25,10 +24,8 @@
 # include <stdio.h>
 # include <string.h>
 
-# include "ph_typedefs.h"
-
-# include "ph_init.h"
-# include "ph_run.h"
-# include "ph_utils.h"
+# include "ph_enums.h"
+# include "ph_declarations.h"
+# include "ph_structs.h"
 
 #endif

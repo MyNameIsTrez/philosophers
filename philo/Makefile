@@ -28,9 +28,9 @@ LIBS :=
 ################################################################################
 
 SOURCES :=\
-src/init/atoi_safe/atoi_range.c\
-src/init/atoi_safe/utils.c\
-src/init/atoi_safe.c\
+src/init/get_size/atoi_range.c\
+src/init/get_size/utils.c\
+src/init/get_size.c\
 src/init/init.c\
 src/run/run_philosopher.c\
 src/run/main_loop.c\
@@ -38,6 +38,7 @@ src/utils/destroy.c\
 src/utils/mutex.c\
 src/utils/print_error.c\
 src/utils/print_event.c\
+src/utils/strlen.c\
 src/utils/join_philosophers.c\
 src/utils/time.c\
 src/main.c
@@ -45,11 +46,10 @@ src/main.c
 ################################################################################
 
 HEADERS +=\
-include/ph_init.h\
-include/ph_private_atoi_safe.h\
-include/ph_run.h\
-include/ph_typedefs.h\
-include/ph_utils.h\
+include/ph_declarations.h\
+include/ph_enums.h\
+include/ph_get_size.h\
+include/ph_structs.h\
 include/philo.h
 
 ################################################################################

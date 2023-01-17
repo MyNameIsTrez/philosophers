@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   get_size.c                                         :+:    :+:            */
+/*   parse_size.c                                       :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
@@ -11,23 +11,9 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-#include "ph_get_size.h"
+#include "ph_parse_size.h"
 
-/**
- * @brief Converts @p str to a int and puts it in the pointer @p nbr.
- * This function is safer than atoi() because it returns a boolean that
- * is false when no number was found in @p str.
- * With atoi("0") and atoi("a") you can't tell whether @p str
- * contains a number, because those calls both return 0.
- * If the return value is false, the value of @p nbr is undefined.
- *
- * @param str May start with whitespace, and the first encountered number will
- * be converted to a int.
- * @param size_ptr The size result will be put in here.
- * The dereferenced value won't be touched if no number was found in the string.
- * @return true if a number was found in @p str, false otherwise.
- */
-bool	get_size(const char *str, size_t *size_ptr)
+bool	parse_size(const char *str, size_t *size_ptr)
 {
 	bool	out_of_range;
 	int		i;
@@ -42,7 +28,7 @@ bool	get_size(const char *str, size_t *size_ptr)
 		i++;
 	if (!ph_isdigit(str[i]))
 		return (false);
-	range_result = ph_atoi_range(str, &out_of_range);
+	range_result = atoi_range(str, &out_of_range);
 	if (out_of_range || range_result <= 0)
 		return (false);
 	*size_ptr = (size_t)range_result;

@@ -12,6 +12,7 @@
 
 #include "philo.h"
 
+__attribute__((warn_unused_result))
 static bool	create_philosophers(t_data *data)
 {
 	size_t			philosopher_index;
@@ -61,6 +62,7 @@ static bool	create_philosophers(t_data *data)
 	return (true);
 }
 
+__attribute__((warn_unused_result))
 static bool	init_forks(t_data *data)
 {
 	size_t	fork_index;
@@ -87,18 +89,20 @@ static bool	init_forks(t_data *data)
 	return (true);
 }
 
+__attribute__((warn_unused_result))
 static bool	init_argv(int argc, char *argv[], t_data *data)
 {
 	data->times_to_eat = 0;
-	if (!get_size(argv[1], &data->philosopher_count)
-		|| !get_size(argv[2], &data->time_to_die)
-		|| !get_size(argv[3], &data->time_to_eat)
-		|| !get_size(argv[4], &data->time_to_sleep)
-		|| (argc == 6 && !get_size(argv[5], &data->times_to_eat)))
+	if (!parse_size(argv[1], &data->philosopher_count)
+		|| !parse_size(argv[2], &data->time_to_die)
+		|| !parse_size(argv[3], &data->time_to_eat)
+		|| !parse_size(argv[4], &data->time_to_sleep)
+		|| (argc == 6 && !parse_size(argv[5], &data->times_to_eat)))
 		return (print_error(ERROR_EXPECTED_NATURAL_NUMBER));
 	return (true);
 }
 
+__attribute__((warn_unused_result))
 static bool	init_data_mutexes(t_data *data)
 {
 	data->running_program_mutex.initialized = false;
@@ -138,7 +142,8 @@ bool	init(int argc, char *argv[], t_data *data)
 	if (!init_data_mutexes(data))
 		return (print_error(ERROR_INIT_MUTEX));
 
-	init_argv(argc, argv, data);
+	if (!init_argv(argc, argv, data))
+		return (false);
 
 	if (!init_forks(data))
 		return (print_error(ERROR_SYSTEM));

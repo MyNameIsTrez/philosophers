@@ -11,8 +11,9 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-#include "ph_get_size.h"
+#include "ph_parse_size.h"
 
+__attribute__((warn_unused_result))
 static int	char_to_digit(const char chr)
 {
 	if ('0' <= chr && chr <= '9')
@@ -29,6 +30,7 @@ static int	char_to_digit(const char chr)
  * or subtracting a digit results in underflow.
  * @return
  */
+__attribute__((warn_unused_result))
 static int	get_negative_value(const char *str, bool *out_of_range)
 {
 	static const int	range_mult_ten = INT_MIN / 10;
@@ -62,7 +64,7 @@ static int	get_negative_value(const char *str, bool *out_of_range)
  * @param out_of_range
  * @return The converted value or 0 if no number was found in @p str.
  */
-int	ph_atoi_range(const char *str, bool *out_of_range)
+int	atoi_range(const char *str, bool *out_of_range)
 {
 	int		sign;
 	int		value;

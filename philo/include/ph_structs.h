@@ -13,6 +13,8 @@
 #ifndef PH_STRUCTS_H
 # define PH_STRUCTS_H
 
+# include "philo.h"
+
 # include "ph_declarations.h"
 
 struct s_mutex

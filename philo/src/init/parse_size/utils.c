@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-#include "ph_get_size.h"
+#include "ph_parse_size.h"
 
 static void	*ph_memchr(const void *ptr, int chr, size_t len)
 {
@@ -31,6 +31,7 @@ static void	*ph_memchr(const void *ptr, int chr, size_t len)
 	return (NULL);
 }
 
+__attribute__((warn_unused_result))
 static char	*ph_strchr(const char *str, int chr)
 {
 	return (ph_memchr(str, chr, ph_strlen(str) + 1));

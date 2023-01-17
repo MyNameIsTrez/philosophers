@@ -39,7 +39,7 @@ t_time	get_time_ms(void);
 void	precise_sleep(t_time start_time, t_time duration, t_data *data);
 
 void	*run_philosopher(void *pthread_args);
-void	main_loop(t_data *data);
+void	run(t_data *data);
 
 bool	get_size(const char *str, size_t *size_ptr);
 bool	init(int argc, char *argv[], t_data *data);

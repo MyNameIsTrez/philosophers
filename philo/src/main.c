@@ -27,7 +27,7 @@ int	main(int argc, char *argv[])
 		// atexit(check_leaks); // TODO: REMOVE
 		return (EXIT_FAILURE);
 	}
-	main_loop(&data);
+	run(&data);
 	mutex_lock(&data.running_program_mutex);
 	data.running_program = false;
 	mutex_unlock(&data.running_program_mutex);

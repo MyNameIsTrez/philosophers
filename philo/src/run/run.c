@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   main_loop.c                                        :+:    :+:            */
+/*   run.c                                              :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: sbos <sbos@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
@@ -36,7 +36,7 @@ static bool	any_philosopher_starved(t_data *data)
 	return (false);
 }
 
-void	main_loop(t_data *data)
+void	run(t_data *data)
 {
 	while (true)
 	{

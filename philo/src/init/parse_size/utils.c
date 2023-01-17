@@ -13,6 +13,7 @@
 #include "philo.h"
 #include "ph_parse_size.h"
 
+__attribute__((warn_unused_result))
 static void	*ph_memchr(const void *ptr, int chr, size_t len)
 {
 	unsigned char	*ptr_;

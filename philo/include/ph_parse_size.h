@@ -19,8 +19,10 @@
 
 # define WHITESPACE " \t\n\v\f\r"
 
+// init/parse_size/atoi_range.c
 int		atoi_range(const char *str, bool *out_of_range);
 
+// init/parse_size/utils.c
 bool	ph_isspace(const int chr);
 int		ph_isdigit(int chr);
 

@@ -21,7 +21,6 @@ static bool	any_philosopher_starved(t_data *data)
 	while (philosopher_index < data->philosopher_count)
 	{
 		philosopher = &data->philosophers[philosopher_index];
-
 		mutex_lock(&philosopher->time_of_last_meal_mutex);
 		if (get_time_ms() - philosopher->time_of_last_meal > data->time_to_die)
 		{
@@ -30,7 +29,6 @@ static bool	any_philosopher_starved(t_data *data)
 			return (true);
 		}
 		mutex_unlock(&philosopher->time_of_last_meal_mutex);
-
 		philosopher_index++;
 	}
 	return (false);

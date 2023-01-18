@@ -16,6 +16,7 @@
 // {
 // 	system("leaks -q philo");
 // }
+// atexit(check_leaks);
 
 int	main(int argc, char *argv[])
 {
@@ -24,7 +25,6 @@ int	main(int argc, char *argv[])
 	if (!init(argc, argv, &data))
 	{
 		destroy(&data);
-		// atexit(check_leaks); // TODO: REMOVE
 		return (EXIT_FAILURE);
 	}
 	run(&data);
@@ -33,6 +33,5 @@ int	main(int argc, char *argv[])
 	mutex_unlock(&data.running_program_mutex);
 	join_philosophers(data.philosopher_count, &data);
 	destroy(&data);
-	// atexit(check_leaks); // TODO: REMOVE
 	return (EXIT_SUCCESS);
 }

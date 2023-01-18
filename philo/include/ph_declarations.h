@@ -27,32 +27,25 @@ void		destroy(t_data *data);
 void	mutex_lock(t_mutex *mutex_ptr);
 void	mutex_unlock(t_mutex *mutex_ptr);
 void	mutex_destroy(t_mutex *mutex_ptr);
-bool	mutex_init(t_mutex *mutex_ptr)
-		__attribute__((warn_unused_result));
+bool	mutex_init(t_mutex *mutex_ptr);
 
-bool	print_error(t_error ph_error)
-		__attribute__((warn_unused_result));
+bool	print_error(t_error ph_error);
 void	print_event(t_event event, t_philosopher *philosopher, t_data *data);
 
-size_t	ph_strlen(const char *str)
-		__attribute__((warn_unused_result));
+size_t	ph_strlen(const char *str);
 
 void	join_philosophers(size_t count, t_data *data);
 
-t_time	get_time_ms(void)
-		__attribute__((warn_unused_result));
+t_time	get_time_ms(void);
 void	precise_sleep(t_time start_time, t_time duration, t_data *data);
 
 void	*run_philosopher(void *pthread_args);
 void	run(t_data *data);
 
-bool	parse_size(const char *str, size_t *size_ptr)
-		__attribute__((warn_unused_result));
-bool	init(int argc, char *argv[], t_data *data)
-		__attribute__((warn_unused_result));
+bool	parse_size(const char *str, size_t *size_ptr);
+bool	init(int argc, char *argv[], t_data *data);
 
 void	init_philosophers_time_of_last_meal(t_data *data);
-bool	create_philosophers(t_data *data)
-		__attribute__((warn_unused_result));
+bool	create_philosophers(t_data *data);
 
 #endif

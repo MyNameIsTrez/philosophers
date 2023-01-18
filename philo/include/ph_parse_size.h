@@ -19,12 +19,9 @@
 
 # define WHITESPACE " \t\n\v\f\r"
 
-int		atoi_range(const char *str, bool *out_of_range)
-		__attribute__((warn_unused_result));
+int		atoi_range(const char *str, bool *out_of_range);
 
-bool	ph_isspace(const int chr)
-		__attribute__((warn_unused_result));
-int		ph_isdigit(int chr)
-		__attribute__((warn_unused_result));
+bool	ph_isspace(const int chr);
+int		ph_isdigit(int chr);
 
 #endif

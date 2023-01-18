@@ -12,7 +12,6 @@
 
 #include "philo.h"
 
-__attribute__((warn_unused_result))
 static bool	any_philosopher_starved(t_data *data)
 {
 	size_t			philosopher_index;

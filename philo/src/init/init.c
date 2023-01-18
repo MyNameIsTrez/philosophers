@@ -12,7 +12,6 @@
 
 #include "philo.h"
 
-__attribute__((warn_unused_result))
 static bool	init_forks(t_data *data)
 {
 	size_t	fork_index;
@@ -36,7 +35,6 @@ static bool	init_forks(t_data *data)
 	return (true);
 }
 
-__attribute__((warn_unused_result))
 static bool	init_argv(int argc, char *argv[], t_data *data)
 {
 	data->times_to_eat = 0;
@@ -49,7 +47,6 @@ static bool	init_argv(int argc, char *argv[], t_data *data)
 	return (true);
 }
 
-__attribute__((warn_unused_result))
 static bool	init_data_mutexes(t_data *data)
 {
 	data->running_program_mutex.initialized = false;

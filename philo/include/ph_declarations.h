@@ -50,4 +50,11 @@ bool	create_philosophers(t_data *data);
 
 bool	should_stop(t_data *data);
 
+// run/philosopher_actions.c
+void	grab_forks(t_philosopher *philosopher, t_data *data);
+void	eat(t_philosopher *philosopher, t_data *data);
+void	drop_forks(t_philosopher *philosopher);
+void	ph_sleep(t_philosopher *philosopher, t_data *data);
+void	think(t_philosopher *philosopher, t_data *data);
+
 #endif

@@ -15,39 +15,17 @@
 static void	run_single_philosopher_edgecase(t_philosopher *philosopher,
 				t_data *data)
 {
-	mutex_lock(&data->running_program_mutex);
-	if (!data->running_program)
-	{
-		mutex_unlock(&data->running_program_mutex);
+	if (should_stop(data))
 		return ;
-	}
-	mutex_unlock(&data->running_program_mutex);
 	mutex_lock(philosopher->left_fork);
 	print_event(EVENT_FORK, philosopher, data);
 	while (true)
 	{
-		mutex_lock(&data->running_program_mutex);
-		if (!data->running_program)
-		{
-			mutex_unlock(&data->running_program_mutex);
+		if (should_stop(data))
 			break ;
-		}
-		mutex_unlock(&data->running_program_mutex);
 		usleep(LOOP_USLEEP);
 	}
 	mutex_unlock(philosopher->left_fork);
-}
-
-static bool	should_stop(t_data *data)
-{
-	mutex_lock(&data->running_program_mutex);
-	if (!data->running_program) // TODO: Should this check be done after every action below?
-	{
-		mutex_unlock(&data->running_program_mutex);
-		return (true);
-	}
-	mutex_unlock(&data->running_program_mutex);
-	return (false);
 }
 
 static void	grab_forks(t_philosopher *philosopher, t_data *data)

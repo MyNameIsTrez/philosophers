@@ -40,6 +40,7 @@ src/utils/join_philosophers.c\
 src/utils/mutex.c\
 src/utils/print_error.c\
 src/utils/print_event.c\
+src/utils/should_stop.c\
 src/utils/strlen.c\
 src/utils/time.c\
 src/main.c

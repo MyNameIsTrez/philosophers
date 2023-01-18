@@ -48,4 +48,6 @@ bool	init(int argc, char *argv[], t_data *data);
 void	init_philosophers_time_of_last_meal(t_data *data);
 bool	create_philosophers(t_data *data);
 
+bool	should_stop(t_data *data);
+
 #endif

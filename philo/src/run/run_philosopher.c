@@ -19,12 +19,8 @@ static void	run_single_philosopher(t_philosopher *philosopher,
 		return ;
 	mutex_lock(philosopher->left_fork);
 	print_event(EVENT_FORK, philosopher, data);
-	while (true)
-	{
-		if (should_stop(data))
-			break ;
+	while (!should_stop(data))
 		usleep(LOOP_USLEEP);
-	}
 	mutex_unlock(philosopher->left_fork);
 }
 
@@ -33,10 +29,8 @@ static void	run_regular_philosopher(t_philosopher *philosopher, t_data *data)
 	if (philosopher->index % 2 == 1)
 		precise_sleep(philosopher->time_of_last_meal, data->time_to_eat / 2,
 			data);
-	while (true)
+	while (!should_stop(data))
 	{
-		if (should_stop(data))
-			return ;
 		grab_forks(philosopher, data);
 		eat(philosopher, data);
 		drop_forks(philosopher);
